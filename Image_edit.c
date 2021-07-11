@@ -116,3 +116,18 @@ void paint(FRAMEDATA *fData){
 		}
 	}
 }
+
+//select function
+
+//copy function
+
+//paste function
+
+//undo+redo paste function
+
+/*
+the clipboard consists of 2 memory blocks
+1) contains the copied block
+2) contains th data in the block that the paste function
+	pasted onto. To be used by the undo unction.
+*/
