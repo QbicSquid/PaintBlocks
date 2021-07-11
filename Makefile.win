@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o paintb.o
-LINKOBJ  = main.o paintb.o
+OBJ      = main.o paintb.o Image_edit.o
+LINKOBJ  = main.o paintb.o Image_edit.o
 LIBS     = -L"F:/soft/Dev-Cpp/MinGW64/lib" -L"F:/soft/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -g3
 INCS     = -I"F:/soft/Dev-Cpp/MinGW64/include" -I"F:/soft/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"F:/soft/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"F:/soft/Dev-Cpp/MinGW64/include" -I"F:/soft/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"F:/soft/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"F:/soft/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -29,3 +29,6 @@ main.o: main.c
 
 paintb.o: paintb.c
 	$(CC) -c paintb.c -o paintb.o $(CFLAGS)
+
+Image_edit.o: Image_edit.c
+	$(CC) -c Image_edit.c -o Image_edit.o $(CFLAGS)

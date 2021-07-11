@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "paintb.h"
 
-int main() {
+int main(){
 	unsigned char frameString[8500];
 	
 	FRAMEDATA fData;

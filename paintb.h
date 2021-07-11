@@ -14,8 +14,8 @@ typedef struct FRAMEDATA{
 	unsigned char cursorMem;
 }FRAMEDATA;
 
+//paintb.c
 void initNewCanvas(FRAMEDATA *fData);
-void paint(FRAMEDATA *fData);
 void blockEdit(FRAMEDATA *fData, int blockRow, int blockCol, int key);
 void cursorMove(FRAMEDATA *fData, int key);
 void cursorAdd(FRAMEDATA *fData);
@@ -23,5 +23,8 @@ void cursorRem(FRAMEDATA *fData);
 void pause();
 int loadFile(FRAMEDATA *fData, char fileName[]);
 int saveFile(FRAMEDATA *fData, char fileName[]);
+
+//image_edit.c
+void paint(FRAMEDATA *fData);
 
 #endif
