@@ -10,9 +10,15 @@ the clipboard consists of 2 memory blocks
 
 int main(){
 	unsigned char frameString[8500];
+	unsigned char frameStringBU[8500];
+	unsigned char clipString[8500];
+	unsigned char undoString[8500];
 	
 	FRAMEDATA fData;
 	fData.frameStringPTR = frameString;
+	fData.frameStringBUPTR = frameStringBU;
+	fData.clipStringPTR = clipString;
+	fData.undoStringPTR = undoString;
 	fData.cursorCol = 0;
 	fData.cursorRow = 0;
 	fData.cursorMem = ' ';

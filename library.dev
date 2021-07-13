@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=1
 CompilerSettings=0000000000000000001000000
-UnitCount=3
+UnitCount=4
 
 [VersionInfo]
 Major=1
@@ -72,6 +72,16 @@ BuildCmd=
 
 [Unit2]
 FileName=paintb.h
+CompileCpp=0
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit4]
+FileName=Image_edit.c
 CompileCpp=0
 Folder=
 Compile=1

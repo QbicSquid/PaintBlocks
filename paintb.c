@@ -28,7 +28,7 @@ void initNewCanvas(FRAMEDATA *fData){
 	(*fData).frameStringPTR[((*fData).rows + 1) * ((*fData).cols + 3) + ((*fData).cols + 2)] = '\0';
 	
 	// adding the cursor
-	blockEdit(fData, (*fData).cursorRow, (*fData).cursorCol, 2);
+	cursorAdd(fData);
 	// initializing complete
 }
 
@@ -86,6 +86,11 @@ void cursorAdd(FRAMEDATA *fData){
 
 void cursorRem(FRAMEDATA *fData){
 	(*fData).frameStringPTR[((*fData).cursorRow + 1) * ((*fData).cols + 3) + ((*fData).cursorCol + 1)] = (*fData).cursorMem;
+}
+
+void cursorRestore(FRAMEDATA *fData){
+	(*fData).cursorMem = (*fData).frameStringPTR[((*fData).cursorRow + 1) * ((*fData).cols + 3) + ((*fData).cursorCol + 1)];
+	(*fData).frameStringPTR[((*fData).cursorRow + 1) * ((*fData).cols + 3) + ((*fData).cursorCol + 1)] = 206;
 }
 
 void pause(){
