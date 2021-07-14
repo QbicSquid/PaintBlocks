@@ -55,28 +55,10 @@ int main(){
 			cursorAdd(&fData);
 		}
 		else if(ch == '3'){
-			char help1[] = "Help\n\n"
-				"> Use arrow keys to move cursor.\n"
-				"> Use WASD to place paint blocks.\n"
-				"> Use Shift/CapsLock + WASD to erase paint blocks.\n"
-				"> Use F keys to access additional functionality.(Copy/Pase/Undo/Redo).\n\n";
-			char help2[] = "Using the copy/pase functionality.\n"
-				"> Press the copy key(F5).\n"
-				"> Select the exact blocks you wish to copy(using WASD and arrow keys).\n"
-				"> Press F1 to copy.\n"
-				"> You will now be at the initial canvas, press the paste key(F6) to paste.\n"
-				"> Navigate using the arrow keys and press F1 to confirm the paste.\n\n";
-			char help3[] = "Using the undo/redo functionality\n"
-				"> Press F7 while in the canvas to undo or redo the previous paste.\n"
-				"> The functionaly will be lost when you paint/erase a paint block.\n"
-				"> It will be usable again afte the next paste.\n"
-				"> Moving the cursor does not affect the availability of the undo/redo function.\n\n";
-			printf("%s", cls);
-			printf("%s", help1);
-			pause();
-			printf("\n\n%s", help2);
-			pause();
-			printf("\n\n%s", help3);
+			printf("%sHelp\n\n", cls);
+			printf("> Use arrow keys to move cursor\n");
+			printf("> Use WASD to place paint blocks\n");
+			printf("> Use Shift/CapsLock + WASD to erase paint blocks\n\n");
 			pause();
 			continue;
 		}
