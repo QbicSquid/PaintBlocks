@@ -1,14 +1,19 @@
 #include <stdio.h>
 #include "paintb.h"
 
-int main() {
+
+int main(){
 	unsigned char frameString[8500];
+	unsigned char frameStringBU[8500];
+	unsigned char clipString[8500];
+	unsigned char undoString[8500];
 	
 	FRAMEDATA fData;
 	fData.frameStringPTR = frameString;
-	fData.cursorCol = 0;
-	fData.cursorRow = 0;
-	fData.cursorMem = ' ';
+	fData.frameStringBUPTR = frameStringBU;
+	fData.clipStringPTR = clipString;
+	fData.undoStringPTR = undoString;
+	fData.clipRows = -99;
 	
 	char fileName[255];
 	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
@@ -36,8 +41,16 @@ int main() {
 			}
 		}
 		else if(ch == '2'){
-			printf("\n\n\nEnter File Name:\n(File must be in the same directory as the program and must have no spaces)\n\n");
+			printf("\n\n\nEnter File Name:\n");
+			printf("(File must be in the same directory as the program and must have no spaces)\n");
+			printf("Enter 'q' to cancel\n");
 			scanf("%s", fileName);
+			
+			if(fileName[0] == 'q' && fileName[1] == '\0'){
+				printf("Load cancelled\n");
+				pause();
+				continue;
+			}
 			
 			ch = loadFile(&fData, fileName); // loading framestring
 			if(ch < 0){ // if framestring was not loaded properly
@@ -50,10 +63,28 @@ int main() {
 			cursorAdd(&fData);
 		}
 		else if(ch == '3'){
-			printf("%sHelp\n\n", cls);
-			printf("> Use arrow keys to move cursor\n");
-			printf("> Use WASD to place paint blocks\n");
-			printf("> Use Shift/CapsLock + WASD to erase paint blocks\n\n");
+			char help1[] = "Help\n\n"
+				"> Use arrow keys to move cursor.\n"
+				"> Use WASD to place paint blocks.\n"
+				"> Use Shift/CapsLock + WASD to erase paint blocks.\n"
+				"> Use F keys to access additional functionality.(Copy/Pase/Undo/Redo).\n\n";
+			char help2[] = "Using the copy/pase functionality.\n"
+				"> Press the copy key(F5).\n"
+				"> Select the exact blocks you wish to copy(using WASD and arrow keys).\n"
+				"> Press F1 to copy.\n"
+				"> You will now be at the initial canvas, press the paste key(F6) to paste.\n"
+				"> Navigate using the arrow keys and press F1 to confirm the paste.\n\n";
+			char help3[] = "Using the undo/redo functionality\n"
+				"> Press F7 while in the canvas to undo or redo the previous paste.\n"
+				"> The functionaly will be lost when you paint/erase a paint block.\n"
+				"> It will be usable again afte the next paste.\n"
+				"> Moving the cursor does not affect the availability of the undo/redo function.\n\n";
+			printf("%s", cls);
+			printf("%s", help1);
+			pause();
+			printf("\n\n%s", help2);
+			pause();
+			printf("\n\n%s", help3);
 			pause();
 			continue;
 		}
