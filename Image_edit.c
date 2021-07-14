@@ -9,6 +9,15 @@ void paint(FRAMEDATA *fData){
 	\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 	char fileName[255] = {0};
 	
+	// loading the framString into the frameStringBU, for safety reasons
+	cursorRem(fData);
+	ch = -1;
+	do{ 
+		ch++;
+		(*fData).frameStringBUPTR[ch] = (*fData).frameStringPTR[ch];
+	} while ((*fData).frameStringPTR[ch] != '\0');
+	cursorRestore(fData);
+	
 	while(1){
 		printf("%s%s\nF1-Save and Exit | F2-Exit | F5-Copy | F6-Paste | F7-Undo/Redo last paste", cls, (*fData).frameStringPTR);
 		
@@ -44,8 +53,17 @@ void paint(FRAMEDATA *fData){
 		else if(ch == 0){
 			switch(getch()){
 			case 59:
-				printf("\n\nEnter the save file name:\n(File must not already exist within the program's directory and must have no spaces)\n");
+				printf("\n\nEnter the save file name:\n");
+				printf("(File must not already exist within the program's directory and must have no spaces)\n");
+				printf("Enter 'q' to cancel save\n");
 				scanf("%s", &fileName);//fgets(fileName, 255, stdin);
+				
+				if(fileName[0] == 'q' && fileName[1] == '\0'){
+					printf("Save cancelled, Returning to canvas\n");
+					pause();
+					continue;
+				}
+				
 				// call the saveFile() fuction
 				cursorRem(fData);
 				ch = saveFile(fData, fileName);
@@ -291,6 +309,8 @@ void copy(FRAMEDATA *fData){
 	int rowsTop = -1, rowsBottom = -1;
 	int colsLeft = -1, colsRight = -1;
 	
+	cursorRem(fData);
+	
 	//selecting the rectangular area to copy
 	for(i = 0; i < (*fData).rows; i++){ // scanning from top to botton
 		for(j = 0; j < (*fData).cols; j++){
@@ -362,6 +382,8 @@ void copy(FRAMEDATA *fData){
 			}
 		}
 	}
+	
+	cursorAdd(fData);
 }
 
 int clipDown(FRAMEDATA *fData){ // returns 1 if the paste was done. Returns 0 otherwise
@@ -506,23 +528,14 @@ void undo(FRAMEDATA *fData){
 		i++;
 		(*fData).undoStringPTR[i] = temp[i];
 	} while (temp[i] != '\0');
+	
+	i = -1;
+	do{ // loading the current frameString into frameStringBU
+		i++;
+		(*fData).frameStringBUPTR[i] = (*fData).frameStringPTR[i];
+	} while ((*fData).frameStringPTR[i] != '\0');
 	cursorRestore(fData);
 	
 	return;
 }
-//select function -- done, clip()
 
-//copy function -- done, copy()
-
-//paste function -- done, paste()
-
-//undo+redo paste function -- done, undo()
-
-// "good selection" checker to stop users for doing bad crops -- no need, found a workaround
-
-/*
-the clipboard consists of 2 memory blocks
-1) contains the copied block
-2) contains th data in the block that the paste function
-	pasted onto. To be used by the undo unction.
-*/

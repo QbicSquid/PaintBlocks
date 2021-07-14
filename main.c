@@ -41,8 +41,16 @@ int main(){
 			}
 		}
 		else if(ch == '2'){
-			printf("\n\n\nEnter File Name:\n(File must be in the same directory as the program and must have no spaces)\n\n");
+			printf("\n\n\nEnter File Name:\n");
+			printf("(File must be in the same directory as the program and must have no spaces)\n");
+			printf("Enter 'q' to cancel\n");
 			scanf("%s", fileName);
+			
+			if(fileName[0] == 'q' && fileName[1] == '\0'){
+				printf("Load cancelled\n");
+				pause();
+				continue;
+			}
 			
 			ch = loadFile(&fData, fileName); // loading framestring
 			if(ch < 0){ // if framestring was not loaded properly
