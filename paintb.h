@@ -31,7 +31,7 @@ void pause();
 int loadFile(FRAMEDATA *fData, char fileName[]);
 int saveFile(FRAMEDATA *fData, char fileName[]);
 
-//image_edit.c
+//frame_edit.c
 void paint(FRAMEDATA *fData);
 void clipBlockEdit(FRAMEDATA *fData, int blockRow, int blockCol, int key);
 void clipUp(FRAMEDATA *fData);
