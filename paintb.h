@@ -33,7 +33,8 @@ int saveFile(FRAMEDATA *fData, char fileName[]);
 
 //image_edit.c
 void paint(FRAMEDATA *fData);
-void clip(FRAMEDATA *fData);
+void clipUp(FRAMEDATA *fData);
+void copy(FRAMEDATA *fData);
 void clipBlockEdit(FRAMEDATA *fData, int blockRow, int blockCol, int key);
 
 #endif

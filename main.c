@@ -19,9 +19,6 @@ int main(){
 	fData.frameStringBUPTR = frameStringBU;
 	fData.clipStringPTR = clipString;
 	fData.undoStringPTR = undoString;
-	fData.cursorCol = 0;
-	fData.cursorRow = 0;
-	fData.cursorMem = ' ';
 	
 	char fileName[255];
 	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
