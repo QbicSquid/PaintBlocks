@@ -1,2 +1,2 @@
 # PaitBlocks
-Console Based block art and animation creator/player.
+Console Based block art creator.
