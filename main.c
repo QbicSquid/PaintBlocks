@@ -1,12 +1,6 @@
 #include <stdio.h>
 #include "paintb.h"
 
-/* add the clipboard
-the clipboard consists of 2 memory blocks
-1) contains the copied block
-2) contains th data in the block that the paste function
-	pasted onto. To be used by the undo unction.
-*/
 
 int main(){
 	unsigned char frameString[8500];
@@ -19,6 +13,7 @@ int main(){
 	fData.frameStringBUPTR = frameStringBU;
 	fData.clipStringPTR = clipString;
 	fData.undoStringPTR = undoString;
+	fData.clipRows = -99;
 	
 	char fileName[255];
 	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";

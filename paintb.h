@@ -6,7 +6,7 @@
 #endif
 
 typedef struct FRAMEDATA{
-	unsigned char *frameStringPTR; // need to check if this works
+	unsigned char *frameStringPTR;
 	int rows;
 	int cols;
 	int cursorRow;
@@ -33,8 +33,10 @@ int saveFile(FRAMEDATA *fData, char fileName[]);
 
 //image_edit.c
 void paint(FRAMEDATA *fData);
+void clipBlockEdit(FRAMEDATA *fData, int blockRow, int blockCol, int key);
 void clipUp(FRAMEDATA *fData);
 void copy(FRAMEDATA *fData);
-void clipBlockEdit(FRAMEDATA *fData, int blockRow, int blockCol, int key);
+void clipDown(FRAMEDATA *fData);
+void paste(FRAMEDATA *fData, int clipPosRow, int clipPosCol);
 
 #endif

@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include "paintb.h"
 
+
 void paint(FRAMEDATA *fData){
 	int ch;
-	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
+	\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 	char fileName[255] = {0};
 	while(1){
-		printf("%s%s\nF1-Save and Exit | F2-Exit", cls, (*fData).frameStringPTR);
+		printf("%s%s\nF1-Save and Exit | F2-Exit | F5-Copy | F6-Paste", cls, (*fData).frameStringPTR);
 		
 		ch = getch();
 		if(ch == 224){
@@ -63,6 +65,14 @@ void paint(FRAMEDATA *fData){
 				continue;
 			case 63:
 				clipUp(fData);
+				continue;
+			case 64:
+				if((*fData).clipRows == -99){
+					printf("\nNo copied data found\n");
+					pause();
+					continue;
+				}
+				clipDown(fData);
 				continue;
 			}
 		}
@@ -121,10 +131,25 @@ void paint(FRAMEDATA *fData){
 	}
 }
 
+void clipBlockEdit(FRAMEDATA *fData, int blockRow, int blockCol, int key){
+	int blockID;
+	blockID = (blockRow + 1) * ((*fData).cols + 3) + (blockCol + 1);
+	
+	switch(key){
+		case 0:
+			(*fData).frameStringPTR[blockID] = (*fData).frameStringBUPTR[blockID];
+			break;
+		case 1:
+			(*fData).frameStringPTR[blockID] = 197;
+			break;
+	}
+}
+
 void clipUp(FRAMEDATA *fData){
 	int ch;
 	int clipExit = 0;
-	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
+	\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 
 	cursorRem(fData);
 	ch = -1;
@@ -168,16 +193,12 @@ void clipUp(FRAMEDATA *fData){
 		}
 		else if(ch == 0){
 			switch(getch()){
-			case 59: // copy and return to paint function
+			case 59: // copy and go to clipDown function
 					copy(fData);
-					printf("\nCopy successful\n");
 					clipExit = 1;
-					pause();
 					break;
 			case 60: // return to paint funtion
-				printf("\nCopy cancelled\n");
 				clipExit = 1;
-				pause();
 				break;
 			}
 		}
@@ -243,22 +264,10 @@ void clipUp(FRAMEDATA *fData){
 			} while ((*fData).frameStringBUPTR[ch] != '\0');
 			cursorRestore(fData);
 			
+//			clipDown(fData);
+			
 			return;
 		}
-	}
-}
-
-void clipBlockEdit(FRAMEDATA *fData, int blockRow, int blockCol, int key){
-	int blockID;
-	blockID = (blockRow + 1) * ((*fData).cols + 3) + (blockCol + 1);
-	
-	switch(key){
-		case 0:
-			(*fData).frameStringPTR[blockID] = (*fData).frameStringBUPTR[blockID];
-			break;
-		case 1:
-			(*fData).frameStringPTR[blockID] = 197;
-			break;
 	}
 }
 
@@ -327,15 +336,23 @@ void copy(FRAMEDATA *fData){
 	for(i = rowsTop; i < rowsBottom + 1; i++){
 		for(j = colsLeft; j < colsRight + 1; j++){
 			blockID = (i + 1) * ((*fData).cols + 3) + (j + 1);
-			(*fData).clipStringPTR[k] = (*fData).frameStringBUPTR[blockID];
-			k++;
+			
+			if((*fData).frameStringPTR[blockID] == 197){
+				(*fData).clipStringPTR[k] = (*fData).frameStringBUPTR[blockID];
+				k++;
+			}
+			else{
+				(*fData).clipStringPTR[k] = 146;
+				k++;
+			}
 		}
 	}
 }
 
 void clipDown(FRAMEDATA *fData){
 	int i, ch;
-	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
+	\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 	int clipPosRow = (*fData).cursorRow; //
 	int clipPosCol = (*fData).cursorCol; // position of the clip to be pasted
 	cursorRem(fData);
@@ -348,35 +365,34 @@ void clipDown(FRAMEDATA *fData){
 		} while ((*fData).frameStringBUPTR[i] != '\0');
 		
 		//adding the clipboard onto the frameString
-		//paste();
-		// +++++++++++++++++++++++++++++++++++++++++++++++ YOU WERE ABOUT TO FINISH THE paste() FUNCTION NEXT
+		paste(fData, clipPosRow, clipPosCol);
 		
-		printf("%s%s\nF1- | F2-", cls, (*fData).frameStringPTR);
+		printf("%s%s\nF1-Paste and return| F2-Return | F3-Prview original", cls, (*fData).frameStringPTR);
 		
 		//selection
 		ch = getch();
 		if(ch == 224){
 			switch(getch()){
 			case 72:
-				if(clipPosRow < 1 - (*fData).clipRows){
+				if(clipPosRow < 2 - (*fData).clipRows){
 					continue;
 				}
 				clipPosRow--;
 				break;
 			case 75:
-				if(clipPosCol < 1 - (*fData).clipCols){
+				if(clipPosCol < 2 - (*fData).clipCols){
 					continue;
 				}
 				clipPosCol--;
 				break;
 			case 80:
-				if((*fData).rows < clipPosRow){
+				if((*fData).rows - 2 < clipPosRow){
 					continue;
 				}
 				clipPosRow++;
 				break;
 			case 77:
-				if((*fData).cols < clipPosCol){
+				if((*fData).cols - 2 < clipPosCol){
 					continue;
 				}
 				clipPosCol++;
@@ -387,16 +403,34 @@ void clipDown(FRAMEDATA *fData){
 			switch(getch()){
 			case 59:
 				// paste and exit
-					pause();
-					continue;
+				i = -1;
+				do{ // loading the framStringBU into the undoString
+					i++;
+					(*fData).undoStringPTR[i] = (*fData).frameStringBUPTR[i];
+				} while ((*fData).frameStringBUPTR[i] != '\0');
+				
+				i = -1;
+				do{ // loading the framString into the frameStringBU
+					i++;
+					(*fData).frameStringBUPTR[i] = (*fData).frameStringPTR[i];
+				} while ((*fData).frameStringBUPTR[i] != '\0');
+				
+				cursorRestore(fData);
+				return;
 			case 60:
 				// exit
 				
-				pause();
-				continue;
+				i = -1;
+				do{ // loading the framStringBU into the undoString
+					i++;
+					(*fData).frameStringPTR[i] = (*fData).frameStringBUPTR[i];
+				} while ((*fData).frameStringBUPTR[i] != '\0');
+				
+				cursorRestore(fData);
+				return;
 			case 61:
 				// add a "preview original framestring" function here
-				
+				printf("%s%s\n", cls, (*fData).frameStringBUPTR);
 				pause();
 				continue;
 			}
@@ -404,8 +438,29 @@ void clipDown(FRAMEDATA *fData){
 	}
 }
 
-void paste(FRAMEDATA *fData){
+void paste(FRAMEDATA *fData, int clipPosRow, int clipPosCol){
+	int i, j, k;
+	int row,col;
+	int blockID;
 	
+	k = 0;
+	for(i = 0; i < (*fData).clipRows; i++){
+		for(j = 0; j < (*fData).clipCols; j++){
+			row = clipPosRow + i;
+			col = clipPosCol + j;
+			
+			//checking for out of boudns
+			if(-1 < row && row < (*fData).rows && -1 < col && col < (*fData).cols){
+				blockID = (row + 1) * ((*fData).cols + 3) + (col + 1);
+				
+				if((*fData).clipStringPTR[k] != 146){ // checking for null character
+					(*fData).frameStringPTR[blockID] = (*fData).clipStringPTR[k]; // pasting the block
+				}
+			}
+			
+			k++;
+		}
+	}
 	
 	/*
 	gives the top left block of the copied blocks position(row, coluwm) that is relative to the (0, 0) position.
@@ -413,15 +468,19 @@ void paste(FRAMEDATA *fData){
 	NOTE that positions of all blocks aren't generated. Instead the valid range of positions of the top left block is calculated.
 	*/
 }
+
+void undo(FRAMEDATA *fData){
+	
+}
 //select function -- done, clip()
 
 //copy function -- done, copy()
 
-//paste function -- in progress
+//paste function -- done, paste()
 
 //undo+redo paste function
 
-// "good selection" checker to stop users for doing bad crops
+// "good selection" checker to stop users for doing bad crops -- no need, found a workaround
 
 /*
 the clipboard consists of 2 memory blocks

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "paintb.h"
 
+
 void initNewCanvas(FRAMEDATA *fData){
 	int i = 0, j;
 	// initializing the frame string
