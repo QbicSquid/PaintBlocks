@@ -36,7 +36,8 @@ void paint(FRAMEDATA *fData);
 void clipBlockEdit(FRAMEDATA *fData, int blockRow, int blockCol, int key);
 void clipUp(FRAMEDATA *fData);
 void copy(FRAMEDATA *fData);
-void clipDown(FRAMEDATA *fData);
+int clipDown(FRAMEDATA *fData); // returns 1 if the paste was done. Returns 0 otherwise
 void paste(FRAMEDATA *fData, int clipPosRow, int clipPosCol);
+void undo(FRAMEDATA *fData);
 
 #endif

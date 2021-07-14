@@ -4,11 +4,13 @@
 
 void paint(FRAMEDATA *fData){
 	int ch;
+	int pasteDone = 0;
 	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 	\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 	char fileName[255] = {0};
+	
 	while(1){
-		printf("%s%s\nF1-Save and Exit | F2-Exit | F5-Copy | F6-Paste", cls, (*fData).frameStringPTR);
+		printf("%s%s\nF1-Save and Exit | F2-Exit | F5-Copy | F6-Paste | F7-Undo/Redo last paste", cls, (*fData).frameStringPTR);
 		
 		ch = getch();
 		if(ch == 224){
@@ -67,12 +69,17 @@ void paint(FRAMEDATA *fData){
 				clipUp(fData);
 				continue;
 			case 64:
-				if((*fData).clipRows == -99){
+				if((*fData).clipRows == -99){ 
 					printf("\nNo copied data found\n");
 					pause();
 					continue;
 				}
-				clipDown(fData);
+				pasteDone = clipDown(fData);
+				continue;
+			case 65:
+				if(pasteDone == 1){
+					undo(fData);
+				}
 				continue;
 			}
 		}
@@ -83,48 +90,56 @@ void paint(FRAMEDATA *fData){
 					continue;
 				}
 				blockEdit(fData, (*fData).cursorRow - 1, (*fData).cursorCol, 1);
+				pasteDone = 0;
 				break;
 			case  97: //a
 				if((*fData).cursorCol == 0){
 					continue;
 				}
 				blockEdit(fData, (*fData).cursorRow, (*fData).cursorCol - 1, 1);
+				pasteDone = 0;
 				break;
 			case 115: //s
 				if((*fData).cursorRow == (*fData).rows - 1){
 					continue;
 				}
 				blockEdit(fData, (*fData).cursorRow + 1, (*fData).cursorCol, 1);
+				pasteDone = 0;
 				break;
 			case 100: //d
 				if((*fData).cursorCol == (*fData).cols - 1){
 					continue;
 				}
 				blockEdit(fData, (*fData).cursorRow, (*fData).cursorCol + 1, 1);
+				pasteDone = 0;
 				break;
 			case  87: //W
 				if((*fData).cursorRow == 0){
 					continue;
 				}
 				blockEdit(fData, (*fData).cursorRow - 1, (*fData).cursorCol, 0);
+				pasteDone = 0;
 				break;
 			case  65: //A
 				if((*fData).cursorCol == 0){
 					continue;
 				}
 				blockEdit(fData, (*fData).cursorRow, (*fData).cursorCol - 1, 0);
+				pasteDone = 0;
 				break;
 			case  83: //S
 				if((*fData).cursorRow == (*fData).rows - 1){
 					continue;
 				}
 				blockEdit(fData, (*fData).cursorRow + 1, (*fData).cursorCol, 0);
+				pasteDone = 0;
 				break;
 			case  68: //D
 				if((*fData).cursorCol == (*fData).cols - 1){
 					continue;
 				}
 				blockEdit(fData, (*fData).cursorRow, (*fData).cursorCol + 1, 0);
+				pasteDone = 0;
 				break;
 			}
 		}
@@ -349,7 +364,7 @@ void copy(FRAMEDATA *fData){
 	}
 }
 
-void clipDown(FRAMEDATA *fData){
+int clipDown(FRAMEDATA *fData){ // returns 1 if the paste was done. Returns 0 otherwise
 	int i, ch;
 	char cls[65] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 	\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
@@ -416,18 +431,18 @@ void clipDown(FRAMEDATA *fData){
 				} while ((*fData).frameStringBUPTR[i] != '\0');
 				
 				cursorRestore(fData);
-				return;
+				return 1;
 			case 60:
 				// exit
 				
 				i = -1;
-				do{ // loading the framStringBU into the undoString
+				do{ // loading the framStringBU into the FrameString
 					i++;
 					(*fData).frameStringPTR[i] = (*fData).frameStringBUPTR[i];
 				} while ((*fData).frameStringBUPTR[i] != '\0');
 				
 				cursorRestore(fData);
-				return;
+				return 0;
 			case 61:
 				// add a "preview original framestring" function here
 				printf("%s%s\n", cls, (*fData).frameStringBUPTR);
@@ -470,7 +485,30 @@ void paste(FRAMEDATA *fData, int clipPosRow, int clipPosCol){
 }
 
 void undo(FRAMEDATA *fData){
+	int i;
+	char temp[8500];
 	
+	cursorRem(fData);
+	i = -1;
+	do{ // loading the frameString into temp
+		i++;
+		temp[i] = (*fData).frameStringPTR[i];
+	} while ((*fData).frameStringPTR[i] != '\0');
+	
+	i = -1;
+	do{ // loading the undoString into the frameString
+		i++;
+		(*fData).frameStringPTR[i] = (*fData).undoStringPTR[i];
+	} while ((*fData).undoStringPTR[i] != '\0');
+	
+	i = -1;
+	do{ // loading temp into the undoString
+		i++;
+		(*fData).undoStringPTR[i] = temp[i];
+	} while (temp[i] != '\0');
+	cursorRestore(fData);
+	
+	return;
 }
 //select function -- done, clip()
 
@@ -478,7 +516,7 @@ void undo(FRAMEDATA *fData){
 
 //paste function -- done, paste()
 
-//undo+redo paste function
+//undo+redo paste function -- done, undo()
 
 // "good selection" checker to stop users for doing bad crops -- no need, found a workaround
 
