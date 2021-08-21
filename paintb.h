@@ -24,6 +24,8 @@ class canvas {
 
 
 		print() { // debug
+			std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
+							\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 			std::cout << head->frameString;
 			std::cout << std::endl;
 		}
@@ -38,6 +40,7 @@ class canvasCRS: public canvas {
 	public:
 		canvasCRS(int rows, int cols);
 		void cursorToggle();
+		void cursorMov(int key);
 }; 
 
 #endif

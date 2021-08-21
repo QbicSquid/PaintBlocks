@@ -72,3 +72,24 @@ void canvasCRS::cursorToggle() {
 	cursorMem = temp;
 }
 
+void canvasCRS::cursorMov(int key) {
+	cursorToggle();
+	
+	switch (key) {
+		case 'w':
+			if (0 < cursorRow) { --cursorRow; }
+			break;
+		case 'a':
+			if (0 < cursorCol) {--cursorCol; }
+			break;
+		case 's':
+			if (cursorRow < rows - 1) { ++cursorRow; }
+			break;
+		case 'd':
+			if (cursorCol < cols - 1) { ++cursorCol; }
+			break;
+	}
+	
+	cursorToggle();
+}
+

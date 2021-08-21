@@ -1,19 +1,19 @@
 #include <iostream>
+#include <conio.h>
 #include "paintb.h"
 using namespace std;
 
 
 int main(void) {
 	canvasCRS cnv(10, 20);
-	cnv.print();
-
-	int row, col, key;
-	cin >> row >> col >> key;
-	cnv.setBlock(row, col, key);
-	cnv.print();
-	
 	cnv.cursorToggle();
-	cnv.print();
+
+	char key;
+	while (true) {
+		cnv.print();
+		key = getch();
+		cnv.cursorMov(key);
+	}
 
 	return 0;
 }
