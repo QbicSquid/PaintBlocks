@@ -1,4 +1,5 @@
 #include <iostream>
+#include <windows.h>
 #include "paintb.h"
 using namespace std;
 
@@ -49,8 +50,7 @@ void canvas::setBlock(int row, int col, int key) {
 	}
 }
 
-void canvas::print() { // debug
-//	system("cls");
+void canvas::print_fs() {
 	cout << head->frameString << endl;
 }
 
@@ -59,6 +59,15 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	cursorRow = 0;
 	cursorCol = 0;
 	cursorMem = 206;
+
+	// initializing console manipulation
+	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	topLeft.X = 0;
+	topLeft.Y = 0;
+	
+	info.dwSize = 1;
+	info.bVisible = FALSE;
+	// console manipulation initialized
 }
 
 void canvasCRS::cursorToggle() {
@@ -97,5 +106,15 @@ void canvasCRS::cursorMov(int key) {
 	}
 	
 	cursorToggle();
+}
+
+void canvasCRS::print() { // printing with cls
+	std::cout.flush();
+	SetConsoleCursorPosition(consoleHandle, topLeft);// reset the console cursor
+	SetConsoleCursorInfo(consoleHandle, &info);
+	// in case the console resized, making the console cursor invisible again
+	
+	WriteConsole(consoleHandle, head->frameString,
+		(rows + 2) * (cols + 3), NULL, NULL);
 }
 

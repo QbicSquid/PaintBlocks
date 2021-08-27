@@ -1,6 +1,6 @@
 #ifndef PAINTB_H
 #define PAINTB_H
-#include <iostream>
+#include <windows.h>
 
 class canvas {
 	protected:
@@ -14,29 +14,31 @@ class canvas {
 		FS *head;
 		int rows;
 		int cols;
-//		int count;
-//		Made for compatibility with multi frame objects.
-//		Move to "animation" class.
 
 	public:	
 		canvas(int rows, int cols);
 		void setBlock(int row, int col, int key);
 
-
-		void print(); // debug
+		void print_fs(); // innefficient print function
 };
 
 class canvasCRS: public canvas {
 	private:
+		HANDLE consoleHandle;
+		COORD topLeft;
+		CONSOLE_CURSOR_INFO info;
+		// for console manipulation
+
 		int cursorRow;
 		int cursorCol;
-		unsigned char cursorMem;
+		unsigned char cursorMem;	
 
 	public:
 		canvasCRS(int rows, int cols);
 		void cursorToggle();
 		void cursorMov(int key);
-}; 
+		void print();
+};
 
 #endif
 
