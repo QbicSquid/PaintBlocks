@@ -23,12 +23,7 @@ class canvas {
 		void setBlock(int row, int col, int key);
 
 
-		print() { // debug
-			std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
-							\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-			std::cout << head->frameString;
-			std::cout << std::endl;
-		}
+		void print(); // debug
 };
 
 class canvasCRS: public canvas {

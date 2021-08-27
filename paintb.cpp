@@ -38,6 +38,7 @@ canvas::canvas(int rows, int cols) {
 		head->frameString[(cols + 3) * (rows + 1) + c] = 196;
 	}
 	head->frameString[(cols + 3) * (rows + 2) - 2] = 217;
+
 	head->frameString[(cols + 3) * (rows + 2) - 1] = '\0';
 	// framestring initialized
 }
@@ -46,6 +47,11 @@ void canvas::setBlock(int row, int col, int key) {
 	if(0 <= key && key < 256){
 		head->frameString[col + row * (cols + 3)] = key;
 	}
+}
+
+void canvas::print() { // debug
+//	system("cls");
+	cout << head->frameString << endl;
 }
 
 // cursor:
