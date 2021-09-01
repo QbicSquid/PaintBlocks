@@ -58,7 +58,8 @@ void canvas::print_fs() {
 canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	cursorRow = 0;
 	cursorCol = 0;
-	cursorMem = 206;
+	cursorMem = 233;
+	focusedMode = false;
 
 	// initializing console manipulation
 	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -109,12 +110,51 @@ void canvasCRS::cursorMov(int key) {
 }
 
 void canvasCRS::print() { // printing with cls
-	std::cout.flush();
-	SetConsoleCursorPosition(consoleHandle, topLeft);// reset the console cursor
-	SetConsoleCursorInfo(consoleHandle, &info);
-	// in case the console resized, making the console cursor invisible again
+	if(focusedMode == false) {
+		print_fs();
+		return;
+	}
+
+	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
+		if(display[i] != head->frameString[i]) {
+			display[i] = head->frameString[i];
+			jumpTo.X = i % (cols + 3) - 1;
+			jumpTo.Y = i / (cols + 3);
+			out[0] = display[i - 1];
+			out[1] = display[i];
+
+			SetConsoleCursorInfo(consoleHandle, &info);
+			// in case the console resized, making the console cursor invisible
 	
+			SetConsoleCursorPosition(consoleHandle, jumpTo);
+			WriteConsole(consoleHandle, out,
+			2, NULL, NULL); // print
+
+			SetConsoleCursorPosition(consoleHandle, jumpBack);
+			// moveing the console cursor to jumpBack position
+		}
+	}
+}
+
+void canvasCRS::enableFocusedMode() {
+	display = new unsigned char[(rows + 2) * (cols + 3)];
+	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
+		display[i] = head->frameString[i];
+	}
+
+	std::cout.flush();
+	SetConsoleCursorPosition(consoleHandle, topLeft);
+	// reset the console cursor
+	SetConsoleCursorInfo(consoleHandle, &info);
+	// in case the console resized, making the console cursor invisible
+
 	WriteConsole(consoleHandle, head->frameString,
-		(rows + 2) * (cols + 3), NULL, NULL);
+		(rows + 2) * (cols + 3), NULL, NULL); // print
+
+	// saving the position to move the cursor back to
+	jumpBack.X = 0;
+	jumpBack.Y = rows + 2;
+
+	focusedMode = true;
 }
 

@@ -29,6 +29,13 @@ class canvasCRS: public canvas {
 		CONSOLE_CURSOR_INFO info;
 		// for console manipulation
 
+		unsigned char *display;
+		bool focusedMode;
+		COORD jumpTo;
+		COORD jumpBack;
+		char out[2];
+		// for fast display refreshing (focused mode)
+
 		int cursorRow;
 		int cursorCol;
 		unsigned char cursorMem;	
@@ -38,6 +45,7 @@ class canvasCRS: public canvas {
 		void cursorToggle();
 		void cursorMov(int key);
 		void print();
+		void enableFocusedMode();
 };
 
 #endif

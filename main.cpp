@@ -9,6 +9,7 @@ int main(void) {
 	cnv.cursorToggle();
 
 	char key;
+	cnv.enableFocusedMode();
 	while (true) {
 		cnv.print();
 		key = getch();
