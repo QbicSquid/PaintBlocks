@@ -71,7 +71,7 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	// console manipulation initialized
 }
 
-void canvasCRS::cursorToggle() {
+void canvasCRS::toggleCursor() {
 	FS *current = head;
 	unsigned char temp;
 	int rawPos;
@@ -89,7 +89,7 @@ void canvasCRS::cursorToggle() {
 }
 
 void canvasCRS::cursorMov(int key) {
-	cursorToggle();
+	toggleCursor();
 	
 	switch (key) {
 		case 'w':
@@ -106,43 +106,52 @@ void canvasCRS::cursorMov(int key) {
 			break;
 	}
 	
-	cursorToggle();
+	toggleCursor();
 }
 
-void canvasCRS::print() { // printing with cls
+void canvasCRS::print() {
 	if(focusedMode == false) {
 		print_fs();
 		return;
 	}
 
 	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
-		if(display[i] != head->frameString[i]) {
-			display[i] = head->frameString[i];
-			jumpTo.X = i % (cols + 3) - 1;
-			jumpTo.Y = i / (cols + 3);
-			out[0] = display[i - 1];
-			out[1] = display[i];
-
-			SetConsoleCursorInfo(consoleHandle, &info);
-			// in case the console resized, making the console cursor invisible
-	
-			SetConsoleCursorPosition(consoleHandle, jumpTo);
-			WriteConsole(consoleHandle, out,
-			2, NULL, NULL); // print
-
-			SetConsoleCursorPosition(consoleHandle, jumpBack);
-			// moveing the console cursor to jumpBack position
+		if(display[i] == head->frameString[i]) {
+			continue;
 		}
+
+		display[i] = head->frameString[i];
+		jumpTo.X = i % (cols + 3) - 1;
+		jumpTo.Y = i / (cols + 3);
+		out[0] = display[i - 1];
+		out[1] = display[i];
+
+		SetConsoleCursorInfo(consoleHandle, &info);
+		// in case the console resized, making the console cursor invisible
+
+		SetConsoleCursorPosition(consoleHandle, jumpTo);
+		WriteConsole(consoleHandle, out,
+		2, NULL, NULL); // print
+
+		SetConsoleCursorPosition(consoleHandle, jumpBack);
+		// moveing the console cursor to jumpBack position
 	}
 }
 
-void canvasCRS::enableFocusedMode() {
+void canvasCRS::toggleFocusedMode() {
+	if(focusedMode == true){
+		delete display;
+		focusedMode = false;
+		return;
+	}
+	
 	display = new unsigned char[(rows + 2) * (cols + 3)];
 	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
 		display[i] = head->frameString[i];
 	}
 
 	std::cout.flush();
+	// TODO: change the below code to clear the screen
 	SetConsoleCursorPosition(consoleHandle, topLeft);
 	// reset the console cursor
 	SetConsoleCursorInfo(consoleHandle, &info);
@@ -150,11 +159,30 @@ void canvasCRS::enableFocusedMode() {
 
 	WriteConsole(consoleHandle, head->frameString,
 		(rows + 2) * (cols + 3), NULL, NULL); // print
+	WriteConsole(consoleHandle, "\n", 1, NULL, NULL); // newline
 
 	// saving the position to move the cursor back to
 	jumpBack.X = 0;
 	jumpBack.Y = rows + 2;
 
 	focusedMode = true;
+}
+
+void canvasCRS::cls()  {
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	if(!GetConsoleScreenBufferInfo(consoleHandle, &csbi)) {
+		// handle failure
+		return;
+	}
+
+	DWORD written = 0;
+	DWORD length = csbi.dwSize.X * csbi.dwSize.Y;
+	FillConsoleOutputCharacter(consoleHandle, TEXT(' '),
+		length, topLeft, &written); // fill the console with spaces
+	FillConsoleOutputAttribute(consoleHandle, csbi.wAttributes,
+		length, topLeft, &written); // clear background color formatting, if any
+
+	SetConsoleCursorPosition(consoleHandle, topLeft);
+	//reset console cursor
 }
 

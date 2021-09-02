@@ -6,10 +6,10 @@ using namespace std;
 
 int main(void) {
 	canvasCRS cnv(10, 20);
-	cnv.cursorToggle();
+	cnv.toggleCursor();
+	cnv.toggleFocusedMode();
 
 	char key;
-	cnv.enableFocusedMode();
 	while (true) {
 		cnv.print();
 		key = getch();
