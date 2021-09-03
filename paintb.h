@@ -36,6 +36,7 @@ class canvasCRS: public canvas {
 		char out[2];
 		// for fast display refreshing (focused mode)
 
+		bool cursor;
 		int cursorRow;
 		int cursorCol;
 		unsigned char cursorMem;	

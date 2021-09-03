@@ -1,8 +1,6 @@
 #include <iostream>
 #include <conio.h>
 #include "paintb.h"
-using namespace std;
-
 
 int main(void) {
 	canvasCRS cnv(10, 20);

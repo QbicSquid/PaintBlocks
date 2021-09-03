@@ -1,8 +1,6 @@
 #include <iostream>
 #include <windows.h>
 #include "paintb.h"
-using namespace std;
-
 
 // canvas:
 canvas::canvas(int rows, int cols) {
@@ -51,7 +49,7 @@ void canvas::setBlock(int row, int col, int key) {
 }
 
 void canvas::print_fs() {
-	cout << head->frameString << endl;
+	std::cout << head->frameString << std::endl;
 }
 
 // cursor:
@@ -59,6 +57,7 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	cursorRow = 0;
 	cursorCol = 0;
 	cursorMem = 233;
+	cursor = false;
 	focusedMode = false;
 
 	// initializing console manipulation
@@ -72,6 +71,8 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 }
 
 void canvasCRS::toggleCursor() {
+	if(cursor == false) {cursor = true;} else {cursor = false;}
+
 	FS *current = head;
 	unsigned char temp;
 	int rawPos;
@@ -89,8 +90,10 @@ void canvasCRS::toggleCursor() {
 }
 
 void canvasCRS::cursorMov(int key) {
+	if(cursor == false) {return;}
+
 	toggleCursor();
-	
+
 	switch (key) {
 		case 'w':
 			if (0 < cursorRow) { --cursorRow; }
@@ -105,7 +108,7 @@ void canvasCRS::cursorMov(int key) {
 			if (cursorCol < cols - 1) { ++cursorCol; }
 			break;
 	}
-	
+
 	toggleCursor();
 }
 
