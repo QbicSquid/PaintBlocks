@@ -1,6 +1,7 @@
 #ifndef PAINTB_H
 #define PAINTB_H
 #include <windows.h>
+#include <string>
 
 class canvas {
 	protected:
@@ -39,15 +40,18 @@ class canvasCRS: public canvas {
 		bool cursor;
 		int cursorRow;
 		int cursorCol;
-		unsigned char cursorMem;	
+		unsigned char cursorMem;
+		// for cursor functionality
 
 	public:
 		canvasCRS(int rows, int cols);
 		void toggleCursor();
-		void cursorMov(int key);
-		void print();
 		void toggleFocusedMode();
 		void cls();
+		void cursorMov(int key);
+		void print();
+		int saveCanvas(std::string fileName);
+		int loadCanvas(std::string fileName);
 };
 
 #endif

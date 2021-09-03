@@ -6,6 +6,8 @@ int main(void) {
 	canvasCRS cnv(10, 20);
 	cnv.toggleCursor();
 	cnv.toggleFocusedMode();
+	
+	cnv.saveCanvas("savefile");// debug line
 
 	char key;
 	while (true) {

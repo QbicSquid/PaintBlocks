@@ -1,5 +1,7 @@
 #include <iostream>
 #include <windows.h>
+#include <fstream>
+#include <string>
 #include "paintb.h"
 
 // canvas:
@@ -187,5 +189,17 @@ void canvasCRS::cls()  {
 
 	SetConsoleCursorPosition(consoleHandle, topLeft);
 	//reset console cursor
+}
+
+int canvasCRS::saveCanvas(std::string fileName) {
+	std::ifstream checkIfOpen(fileName.data());
+	if(checkIfOpen) {return -1;} // checking whther the file already exists
+	checkIfOpen.close();
+
+	std::ofstream file(fileName.data());
+
+	
+
+	file.close();
 }
 
