@@ -16,6 +16,10 @@ class canvas {
 		int rows;
 		int cols;
 
+		int rawPos(int row, int col);
+		int logRow(int rawPos);
+		int logCol(int rawPos);
+
 	public:	
 		canvas(int rows, int cols);
 		void setBlock(int row, int col, int key);

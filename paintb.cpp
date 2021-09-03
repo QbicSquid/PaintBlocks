@@ -44,6 +44,22 @@ canvas::canvas(int rows, int cols) {
 	// framestring initialized
 }
 
+int canvas::rawPos(int row, int col) {
+	return (col + 1) + (row + 1) * (cols + 3);
+}
+
+int canvas::logRow(int rawPos) {
+	int row = rawPos / (cols + 3);
+	if(row == 0 || row + 1 == rows) {return -1;}
+	return row - 1;
+}
+
+int canvas::logCol(int rawPos) {
+	int col = rawPos % (cols + 3);
+	if(col == 0 || col > cols) {return -1;}
+	return col - 1;
+}
+
 void canvas::setBlock(int row, int col, int key) {
 	if(0 <= key && key < 256){
 		head->frameString[col + row * (cols + 3)] = key;
