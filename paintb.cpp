@@ -62,7 +62,7 @@ int canvas::logCol(int rawPos) {
 
 void canvas::setBlock(int row, int col, int key) {
 	if(0 <= key && key < 256){
-		head->frameString[col + row * (cols + 3)] = key;
+		head->frameString[rawPos(row, col)] = key;
 	}
 }
 
@@ -207,14 +207,39 @@ void canvasCRS::cls()  {
 	//reset console cursor
 }
 
-int canvasCRS::saveCanvas(std::string fileName) {
-	std::ifstream checkIfOpen(fileName.data());
-	if(checkIfOpen) {return -1;} // checking whther the file already exists
-	checkIfOpen.close();
+int canvasCRS::getCRow() {
+	return cursorRow;
+}
 
+int canvasCRS::getCCol() {
+	return cursorCol;
+}
+
+int canvasCRS::loadCanvas(std::string fileName) {
+	
+}
+
+int canvasCRS::saveCanvas(std::string fileName) {
+	toggleCursor();
+
+	std::ifstream checkIfOpen(fileName.data()); // checking
+	if(checkIfOpen) {return -1;} // checking whther the file already exists
+	checkIfOpen.close(); // checking
+
+	saveCanvasForce(fileName);
+
+	toggleCursor();
+	return 0;
+}
+
+void canvasCRS::saveCanvasForce(std::string fileName) {
 	std::ofstream file(fileName.data());
 
-	
+	for(int i = 0; i < rows; i++) {
+		for(int j = 0; j < cols; j++) {
+			file << head->frameString[rawPos(i, j)];
+		}
+	}
 
 	file.close();
 }

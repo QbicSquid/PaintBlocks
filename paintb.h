@@ -54,8 +54,11 @@ class canvasCRS: public canvas {
 		void cls();
 		void cursorMov(int key);
 		void print();
-		int saveCanvas(std::string fileName);
+		int getCRow();
+		int getCCol();
 		int loadCanvas(std::string fileName);
+		int saveCanvas(std::string fileName);
+		void saveCanvasForce(std::string fileName);
 };
 
 #endif
