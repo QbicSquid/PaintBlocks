@@ -4,8 +4,8 @@
 
 int main(void) {
 	canvasCRS cnv(10, 20);
-	cnv.toggleCursor();
-	cnv.toggleFocusedMode();
+	cnv.setCursor(true);
+	cnv.setFocusedMode(true);
 
 	int key;
 	while (true) {

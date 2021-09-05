@@ -49,8 +49,8 @@ class canvasCRS: public canvas {
 
 	public:
 		canvasCRS(int rows, int cols);
-		void toggleCursor();
-		void toggleFocusedMode();
+		void setCursor(bool state);
+		void setFocusedMode(bool state);
 		void cls();
 		void cursorMov(int key);
 		void print();

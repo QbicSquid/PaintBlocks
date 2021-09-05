@@ -61,6 +61,8 @@ int canvas::logCol(int rawPos) {
 }
 
 void canvas::setBlock(int row, int col, int key) {
+	if(row < 0 || row >= rows || col < 0 || col >= cols) {return; }
+
 	if(0 <= key && key < 256){
 		head->frameString[rawPos(row, col)] = key;
 	}
@@ -88,8 +90,10 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	// console manipulation initialized
 }
 
-void canvasCRS::toggleCursor() {
-	if(cursor == false) {cursor = true;} else {cursor = false;}
+void canvasCRS::setCursor(bool state) {
+	if(cursor == state) {return; }
+
+	cursor = state;
 
 	FS *current = head;
 	unsigned char temp;
@@ -108,9 +112,9 @@ void canvasCRS::toggleCursor() {
 }
 
 void canvasCRS::cursorMov(int key) {
-	if(cursor == false) {return;}
+	if(cursor == false) {return; }
 
-	toggleCursor();
+	setCursor(false);
 
 	switch (key) {
 		case 'w':
@@ -127,7 +131,7 @@ void canvasCRS::cursorMov(int key) {
 			break;
 	}
 
-	toggleCursor();
+	setCursor(true);
 }
 
 void canvasCRS::print() {
@@ -159,7 +163,9 @@ void canvasCRS::print() {
 	}
 }
 
-void canvasCRS::toggleFocusedMode() {
+void canvasCRS::setFocusedMode(bool state) {
+	if(focusedMode == state) {return; }
+
 	if(focusedMode == true){
 		delete display;
 		focusedMode = false;
@@ -220,15 +226,15 @@ int canvasCRS::loadCanvas(std::string fileName) {
 }
 
 int canvasCRS::saveCanvas(std::string fileName) {
-	toggleCursor();
+	setCursor(false);
 
-	std::ifstream checkIfOpen(fileName.data()); // checking
+	std::ifstream checkIfOpen(fileName.data());
 	if(checkIfOpen) {return -1;} // checking whther the file already exists
-	checkIfOpen.close(); // checking
+	checkIfOpen.close();
 
 	saveCanvasForce(fileName);
 
-	toggleCursor();
+	setCursor(true);
 	return 0;
 }
 
