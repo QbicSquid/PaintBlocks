@@ -85,7 +85,7 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	topLeft.X = 0;
 	topLeft.Y = 0;
 	
-	info.dwSize = 1;
+	info.dwSize = 25;
 	info.bVisible = FALSE;
 	// console manipulation initialized
 }
