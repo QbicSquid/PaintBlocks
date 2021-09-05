@@ -7,32 +7,41 @@ int main(void) {
 	cnv.setCursor(true);
 	cnv.setFocusedMode(true);
 
-	int key;
+	unsigned char key;
 	while (true) {
 		cnv.print();
 		key = getch();
 
 		if(key == 224) {
 			switch(getch()) {
-				case 72:
+				case 72: // arrow key up
 					cnv.setBlock(cnv.getCRow() - 1, cnv.getCCol(), 219);
 					break;
-				case 75:
+				case 75: // arrow key left
 					cnv.setBlock(cnv.getCRow(), cnv.getCCol() - 1, 219);
 					break;
-				case 80:
+				case 80: // arrow key down
 					cnv.setBlock(cnv.getCRow() + 1, cnv.getCCol(), 219);
 					break;
-				case 77:
+				case 77: // arrow key right
 					cnv.setBlock(cnv.getCRow(), cnv.getCCol() + 1, 219);
 					break;
 			}
 		}
-		else if(key == 107) {
-			cnv.saveCanvas("save1");
-		}
 		else {
-			cnv.cursorMov(key);
+			switch(key) {
+				case 'k':
+				case 'K':
+					(void)cnv.saveCanvasForce("save1");
+					break;
+				case 'l':
+				case 'L':
+					(void)cnv.loadCanvas("save1");
+					break;
+				default:
+					(void)cnv.cursorMov(key);
+					break;
+			}
 		}
 	}
 

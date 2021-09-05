@@ -222,31 +222,53 @@ int canvasCRS::getCCol() {
 }
 
 int canvasCRS::loadCanvas(std::string fileName) {
-	
+	std::ifstream file(fileName.data());
+	if(!file) {return -1; }
+
+	int compKey = 0;
+	file >> compKey;
+	if(compKey != COMP_KEY) {return -2; }
+
+	file >> rows >> cols;
+	file.ignore(1);
+	setCursor(false);
+	for(int i = 0; i < rows; i++) {
+		for(int j = 0; j < cols; j++) {
+			head->frameString[rawPos(i, j)] = file.get();
+		}
+	}
+	setCursor(true);
+
+	file.close();
+	return 0;
 }
 
 int canvasCRS::saveCanvas(std::string fileName) {
-	setCursor(false);
-
 	std::ifstream checkIfOpen(fileName.data());
 	if(checkIfOpen) {return -1;} // checking whther the file already exists
 	checkIfOpen.close();
 
-	saveCanvasForce(fileName);
+	(void)saveCanvasForce(fileName);
 
-	setCursor(true);
 	return 0;
 }
 
-void canvasCRS::saveCanvasForce(std::string fileName) {
+int canvasCRS::saveCanvasForce(std::string fileName) {
 	std::ofstream file(fileName.data());
 
+	if(!file) {return -1; }
+
+	file << COMP_KEY << "\n" << rows << " " << cols << "\n";
+
+	setCursor(false);
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
 			file << head->frameString[rawPos(i, j)];
 		}
 	}
+	setCursor(true);
 
 	file.close();
+	return 0;
 }
 

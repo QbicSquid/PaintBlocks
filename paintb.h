@@ -1,5 +1,6 @@
 #ifndef PAINTB_H
 #define PAINTB_H
+#define COMP_KEY 4826
 #include <windows.h>
 #include <string>
 
@@ -58,7 +59,7 @@ class canvasCRS: public canvas {
 		int getCCol();
 		int loadCanvas(std::string fileName);
 		int saveCanvas(std::string fileName);
-		void saveCanvasForce(std::string fileName);
+		int saveCanvasForce(std::string fileName);
 };
 
 #endif
