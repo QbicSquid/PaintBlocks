@@ -178,7 +178,7 @@ void canvasCRS::setFocusedMode(bool state) {
 	}
 
 	std::cout.flush();
-	// TODO: change the below code to clear the screen
+	cls();
 	SetConsoleCursorPosition(consoleHandle, topLeft);
 	// reset the console cursor
 	SetConsoleCursorInfo(consoleHandle, &info);
