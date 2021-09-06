@@ -6,14 +6,13 @@ int main(void) {
 	unsigned char key;
 	unsigned char value;
 	bool cursor = true;
-	canvasCRS cnv(20, 80);
+	canvasCRS cnv(30, 120);
 	cnv.setCursor(true);
 	cnv.setFocusedMode(true);
-	
+
 	// TODO: open another thread for the mouse;
-	// TODO: on a resize event, redraw the whole canvas;
-//	cnv.setMouseInput(true);
-//	cnv.focusedMouseLoop();
+	cnv.setMouseInput(true);
+	cnv.focusedBGInputLoop();
 
 	while (true) {
 		cnv.print();
@@ -37,10 +36,10 @@ int main(void) {
 		if(key == 224) {
 			key = getch();
 			switch(key) {
-				case 72: cnv.cursorMov(cnv.getCRow() - 1, cnv.getCCol()) ; break;
-				case 75: cnv.cursorMov(cnv.getCRow(), cnv.getCCol() - 1) ; break;
-				case 80: cnv.cursorMov(cnv.getCRow() + 1, cnv.getCCol()) ; break;
-				case 77: cnv.cursorMov(cnv.getCRow(), cnv.getCCol() + 1) ; break;
+				case 72: cnv.cursorMov(cnv.getCRow() - 1, cnv.getCCol()); break;
+				case 75: cnv.cursorMov(cnv.getCRow(), cnv.getCCol() - 1); break;
+				case 80: cnv.cursorMov(cnv.getCRow() + 1, cnv.getCCol()); break;
+				case 77: cnv.cursorMov(cnv.getCRow(), cnv.getCCol() + 1); break;
 			}
 		}
 		else if(65 <= key && key <= 90) {

@@ -150,15 +150,12 @@ void canvasCRS::print() {
 		}
 
 		display[i] = head->frameString[i];
-		jumpTo.X = i % (cols + 3) - 1;
+		jumpTo.X = i % (cols + 3);
 		jumpTo.Y = i / (cols + 3);
-		out[0] = display[i - 1];
-		out[1] = display[i];
-		out[2] = display[i + 1]; // TODO: fix this here. The vertical line problem
 
 		SetConsoleCursorPosition(cohan, jumpTo);
-		WriteConsole(cohan, out,
-		3, NULL, NULL); // print
+		WriteConsole(cohan, &display[i],
+		1, NULL, NULL); // print
 
 		SetConsoleCursorPosition(cohan, jumpBack);
 		// moveing the console cursor to jumpBack position
@@ -235,17 +232,31 @@ void canvasCRS::setMouseInput(bool state) {
 	SetConsoleMode(cihan ,ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
 }
 
-void canvasCRS::focusedMouseLoop() {
-	if(focusedMode == false || mouseInput == false) { return; }
+void canvasCRS::focusedBGInputLoop() {
+	if(focusedMode == false) { return; }
 
 	while(true) {
 		DWORD numOfEventsRead;
-		unsigned char out;
 		ReadConsoleInput(cihan, &inputRecord, 1, &numOfEventsRead);
 
-		if(inputRecord.EventType != MOUSE_EVENT) {
-			continue;
+		switch(inputRecord.EventType) {
+			case WINDOW_BUFFER_SIZE_EVENT:
+				SetConsoleCursorPosition(cohan, topLeft);
+				cls();
+				WriteConsole(cohan, head->frameString,
+					(rows + 2) * (cols + 3), NULL, NULL); // print
+				WriteConsole(cohan, "\n", 1, NULL, NULL); // newline
+				break;
+				
+			case MOUSE_EVENT:
+				if(mouseInput == false) { continue; }
+				break;
+				
+			default:
+				continue;
 		}
+
+		unsigned char out;
 		switch(inputRecord.Event.MouseEvent.dwButtonState){
 			case FROM_LEFT_1ST_BUTTON_PRESSED:
 				out = 219;
@@ -264,12 +275,15 @@ void canvasCRS::focusedMouseLoop() {
 
 		head->frameString[rawPos(Y - 1, X - 1)] = out;
 		print();
-		
-		// redraw console window
-		HWND winHandle = GetForegroundWindow();
-		InvalidateRect(winHandle, NULL, FALSE);
-		UpdateWindow(winHandle);
+
+		redrawConsole();
 	}
+}
+
+void canvasCRS::redrawConsole() { // redraw console window
+	HWND winHandle = GetForegroundWindow(); // get window handle
+	InvalidateRect(winHandle, NULL, FALSE); // queue window for updating
+	UpdateWindow(winHandle); // update window
 }
 
 int canvasCRS::loadCanvas(std::string fileName) {
