@@ -30,16 +30,23 @@ class canvas {
 
 class canvasCRS: public canvas {
 	private:
-		HANDLE consoleHandle;
+		HANDLE cohan; // console output handle
+		DWORD prevConsoleMode; // to restore in the destructor
 		COORD topLeft;
-		CONSOLE_CURSOR_INFO info;
+		CONSOLE_CURSOR_INFO cci;
 		// for console manipulation
+
+		bool mouseInput;
+		HANDLE cihan; // console input handle
+		INPUT_RECORD inputRecord;
+		DWORD numOfEventsRead; // required for reading console events
+		// for mouse input
 
 		unsigned char *display;
 		bool focusedMode;
 		COORD jumpTo;
 		COORD jumpBack;
-		char out[2];
+		char out[3];
 		// for fast display refreshing (focused mode)
 
 		bool cursor;
@@ -50,6 +57,7 @@ class canvasCRS: public canvas {
 
 	public:
 		canvasCRS(int rows, int cols);
+		~canvasCRS();
 		void setCursor(bool state);
 		void setFocusedMode(bool state);
 		void cls();
@@ -57,6 +65,8 @@ class canvasCRS: public canvas {
 		void print();
 		int getCRow();
 		int getCCol();
+		void setMouseInput(bool state); // TODO: Finish mouse funnctions
+		void focusedMouseLoop();
 		int loadCanvas(std::string fileName);
 		int saveCanvas(std::string fileName);
 		int saveCanvasForce(std::string fileName);

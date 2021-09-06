@@ -79,15 +79,26 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	cursorMem = 233;
 	cursor = false;
 	focusedMode = false;
+	mouseInput = false;
 
 	// initializing console manipulation
-	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	cohan = GetStdHandle(STD_OUTPUT_HANDLE);
+	cihan = GetStdHandle(STD_INPUT_HANDLE);
+	DWORD prevMode;
+	GetConsoleMode(cihan, &prevMode);
+	prevConsoleMode = prevMode;
+	
+	
 	topLeft.X = 0;
 	topLeft.Y = 0;
 	
-	info.dwSize = 25;
-	info.bVisible = FALSE;
+	cci.dwSize = 25;
+	cci.bVisible = FALSE;
 	// console manipulation initialized
+}
+
+canvasCRS::~canvasCRS() {
+	SetConsoleMode(cihan , prevConsoleMode); // restoring previous consome mode
 }
 
 void canvasCRS::setCursor(bool state) {
@@ -140,6 +151,9 @@ void canvasCRS::print() {
 		return;
 	}
 
+	SetConsoleCursorInfo(cohan, &cci);
+	// in case the console resized, making the console cursor invisible
+
 	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
 		if(display[i] == head->frameString[i]) {
 			continue;
@@ -150,15 +164,13 @@ void canvasCRS::print() {
 		jumpTo.Y = i / (cols + 3);
 		out[0] = display[i - 1];
 		out[1] = display[i];
+		out[2] = display[i + 1]; // TODO: fix this here. The vertical line problem
 
-		SetConsoleCursorInfo(consoleHandle, &info);
-		// in case the console resized, making the console cursor invisible
+		SetConsoleCursorPosition(cohan, jumpTo);
+		WriteConsole(cohan, out,
+		3, NULL, NULL); // print
 
-		SetConsoleCursorPosition(consoleHandle, jumpTo);
-		WriteConsole(consoleHandle, out,
-		2, NULL, NULL); // print
-
-		SetConsoleCursorPosition(consoleHandle, jumpBack);
+		SetConsoleCursorPosition(cohan, jumpBack);
 		// moveing the console cursor to jumpBack position
 	}
 }
@@ -179,14 +191,14 @@ void canvasCRS::setFocusedMode(bool state) {
 
 	std::cout.flush();
 	cls();
-	SetConsoleCursorPosition(consoleHandle, topLeft);
+	SetConsoleCursorPosition(cohan, topLeft);
 	// reset the console cursor
-	SetConsoleCursorInfo(consoleHandle, &info);
+	SetConsoleCursorInfo(cohan, &cci);
 	// in case the console resized, making the console cursor invisible
 
-	WriteConsole(consoleHandle, head->frameString,
+	WriteConsole(cohan, head->frameString,
 		(rows + 2) * (cols + 3), NULL, NULL); // print
-	WriteConsole(consoleHandle, "\n", 1, NULL, NULL); // newline
+	WriteConsole(cohan, "\n", 1, NULL, NULL); // newline
 
 	// saving the position to move the cursor back to
 	jumpBack.X = 0;
@@ -197,19 +209,19 @@ void canvasCRS::setFocusedMode(bool state) {
 
 void canvasCRS::cls()  {
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	if(!GetConsoleScreenBufferInfo(consoleHandle, &csbi)) {
+	if(!GetConsoleScreenBufferInfo(cohan, &csbi)) {
 		// handle failure
 		return;
 	}
 
 	DWORD written = 0;
 	DWORD length = csbi.dwSize.X * csbi.dwSize.Y;
-	FillConsoleOutputCharacter(consoleHandle, TEXT(' '),
+	FillConsoleOutputCharacter(cohan, TEXT(' '),
 		length, topLeft, &written); // fill the console with spaces
-	FillConsoleOutputAttribute(consoleHandle, csbi.wAttributes,
+	FillConsoleOutputAttribute(cohan, csbi.wAttributes,
 		length, topLeft, &written); // clear background color formatting, if any
 
-	SetConsoleCursorPosition(consoleHandle, topLeft);
+	SetConsoleCursorPosition(cohan, topLeft);
 	//reset console cursor
 }
 
@@ -219,6 +231,42 @@ int canvasCRS::getCRow() {
 
 int canvasCRS::getCCol() {
 	return cursorCol;
+}
+
+void canvasCRS::setMouseInput(bool state) {
+	if(mouseInput == state) { return; }
+	if(state == false) {
+		SetConsoleMode(cihan , prevConsoleMode);
+		state = false;
+		return;
+	}
+
+	mouseInput = true;
+	SetConsoleMode(cihan ,ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
+}
+
+void canvasCRS::focusedMouseLoop() {
+	if(focusedMode == false || mouseInput == false) { return; }
+
+	while(true) {
+		ReadConsoleInput(cihan, &inputRecord, 1, &numOfEventsRead);
+
+		if(inputRecord.EventType != MOUSE_EVENT) {
+			continue;
+		}
+		if(inputRecord.Event.MouseEvent.dwButtonState !=
+			FROM_LEFT_1ST_BUTTON_PRESSED) {
+			continue;
+		}
+
+		int Y = inputRecord.Event.MouseEvent.dwMousePosition.Y;
+		int X = inputRecord.Event.MouseEvent.dwMousePosition.X;
+
+		if(Y == 0 || Y >= rows + 1 || X == 0 || X >= cols + 1) { continue; }
+
+		head->frameString[rawPos(Y - 1, X - 1)] = 219;
+		print();
+	}
 }
 
 int canvasCRS::loadCanvas(std::string fileName) {
