@@ -3,52 +3,69 @@
 #include "paintb.h"
 
 int main(void) {
+	unsigned char key;
+	unsigned char value;
+	bool cursor = true;
 	canvasCRS cnv(20, 80);
-//	cnv.setCursor(true);
+	cnv.setCursor(true);
 	cnv.setFocusedMode(true);
 	
 	// TODO: open another thread for the mouse;
 	// TODO: on a resize event, redraw the whole canvas;
-	cnv.setMouseInput(true);
-	cnv.focusedMouseLoop();
+//	cnv.setMouseInput(true);
+//	cnv.focusedMouseLoop();
 
-//	unsigned char key;
-//	while (true) {
-//		cnv.print();
-//		key = getch();
-//
-//		if(key == 224) {
-//			switch(getch()) {
-//				case 72: // arrow key up
-//					cnv.setBlock(cnv.getCRow() - 1, cnv.getCCol(), 219);
-//					break;
-//				case 75: // arrow key left
-//					cnv.setBlock(cnv.getCRow(), cnv.getCCol() - 1, 219);
-//					break;
-//				case 80: // arrow key down
-//					cnv.setBlock(cnv.getCRow() + 1, cnv.getCCol(), 219);
-//					break;
-//				case 77: // arrow key right
-//					cnv.setBlock(cnv.getCRow(), cnv.getCCol() + 1, 219);
-//					break;
-//			}
-//		}
-//		else {
-//			switch(key) {
-//				case 'k':
-//				case 'K':
-//					(void)cnv.saveCanvasForce("save1");
-//					break;
-//				case 'l':
-//				case 'L':
-//					(void)cnv.loadCanvas("save1");
-//					break;
-//				default:
-//					(void)cnv.cursorMov(key);
-//					break;
-//			}
-//		}
-//	}
+	while (true) {
+		cnv.print();
+		key = getch();
+
+		if(key == 't' || key == 'T') {
+			if(cursor == true) {
+				cursor = false;
+				cnv.setCursor(false);
+			}
+			else {
+				cursor = true;
+				cnv.setCursor(true);
+			}
+
+			continue;
+		}
+
+		if(cursor == false) { continue; }
+
+		if(key == 224) {
+			key = getch();
+			switch(key) {
+				case 72: cnv.cursorMov(cnv.getCRow() - 1, cnv.getCCol()) ; break;
+				case 75: cnv.cursorMov(cnv.getCRow(), cnv.getCCol() - 1) ; break;
+				case 80: cnv.cursorMov(cnv.getCRow() + 1, cnv.getCCol()) ; break;
+				case 77: cnv.cursorMov(cnv.getCRow(), cnv.getCCol() + 1) ; break;
+			}
+		}
+		else if(65 <= key && key <= 90) {
+			value = ' ';
+		}
+		else if(97 <= key && key <= 122){
+			value = 219;
+		}
+		else {
+			continue;
+		}
+
+		if(key == 'w' || key == 'W') {
+		cnv.setBlock(cnv.getCRow() - 1, cnv.getCCol(), value);
+		}
+		else if(key == 'a' || key == 'A') {
+			cnv.setBlock(cnv.getCRow(), cnv.getCCol() - 1, value);
+		}
+		else if(key == 's' || key == 'S') {
+			cnv.setBlock(cnv.getCRow() + 1, cnv.getCCol(), value);
+		}
+		else if(key == 'd' || key == 'D') {
+			cnv.setBlock(cnv.getCRow(), cnv.getCCol() + 1, value);
+		}
+	}
 
 	return 0;
 }

@@ -122,24 +122,14 @@ void canvasCRS::setCursor(bool state) {
 	cursorMem = temp;
 }
 
-void canvasCRS::cursorMov(int key) {
+void canvasCRS::cursorMov(int row, int col) {
 	if(cursor == false) {return; }
 
 	setCursor(false);
 
-	switch (key) {
-		case 'w':
-			if (0 < cursorRow) { --cursorRow; }
-			break;
-		case 'a':
-			if (0 < cursorCol) {--cursorCol; }
-			break;
-		case 's':
-			if (cursorRow < rows - 1) { ++cursorRow; }
-			break;
-		case 'd':
-			if (cursorCol < cols - 1) { ++cursorCol; }
-			break;
+	if(0 <= row && row < rows && 0 <= col && col < cols) {
+		cursorRow = row;
+		cursorCol = col;
 	}
 
 	setCursor(true);

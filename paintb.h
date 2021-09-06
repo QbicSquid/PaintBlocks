@@ -60,7 +60,7 @@ class canvasCRS: public canvas {
 		void setCursor(bool state);
 		void setFocusedMode(bool state);
 		void cls();
-		void cursorMov(int key);
+		void cursorMov(int row, int col);
 		void print();
 		int getCRow();
 		int getCCol();
