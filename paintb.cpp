@@ -250,14 +250,21 @@ void canvasCRS::focusedMouseLoop() {
 
 	while(true) {
 		DWORD numOfEventsRead;
+		unsigned char out;
 		ReadConsoleInput(cihan, &inputRecord, 1, &numOfEventsRead);
 
 		if(inputRecord.EventType != MOUSE_EVENT) {
 			continue;
 		}
-		if(inputRecord.Event.MouseEvent.dwButtonState !=
-			FROM_LEFT_1ST_BUTTON_PRESSED) {
-			continue;
+		switch(inputRecord.Event.MouseEvent.dwButtonState){
+			case FROM_LEFT_1ST_BUTTON_PRESSED:
+				out = 219;
+				break;
+			case RIGHTMOST_BUTTON_PRESSED:
+				out = ' ';
+				break;
+			default:
+				continue;
 		}
 
 		int Y = inputRecord.Event.MouseEvent.dwMousePosition.Y;
@@ -265,7 +272,7 @@ void canvasCRS::focusedMouseLoop() {
 
 		if(Y == 0 || Y >= rows + 1 || X == 0 || X >= cols + 1) { continue; }
 
-		head->frameString[rawPos(Y - 1, X - 1)] = 219;
+		head->frameString[rawPos(Y - 1, X - 1)] = out;
 		print();
 		
 		// redraw console window
