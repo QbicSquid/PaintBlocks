@@ -5,33 +5,24 @@
 int main(void) {
 	unsigned char key;
 	unsigned char value;
-	bool cursor = true;
-	canvasCRS cnv(30, 120);
-	cnv.setCursor(true);
+	canvasCRS cnv(20, 60);
 	cnv.setFocusedMode(true);
-
-	// TODO: open another thread for the mouse;
 	cnv.setMouseInput(true);
-	cnv.focusedBGInputLoop();
+
+	cnv.focusedBGInputLoop('c');
+	cnv.setCursorStatus(true);
 
 	while (true) {
 		cnv.print();
 		key = getch();
 
-		if(key == 't' || key == 'T') {
-			if(cursor == true) {
-				cursor = false;
-				cnv.setCursor(false);
-			}
-			else {
-				cursor = true;
-				cnv.setCursor(true);
-			}
-
+		if(key == 'm' || key == 'M') {
+			cnv.setCursorStatus(false);
+			cnv.print();
+			cnv.focusedBGInputLoop('c');
+			cnv.setCursorStatus(true);
 			continue;
 		}
-
-		if(cursor == false) { continue; }
 
 		if(key == 224) {
 			key = getch();

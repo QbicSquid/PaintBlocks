@@ -47,7 +47,7 @@ class canvasCRS: public canvas {
 		COORD jumpBack;
 		// for fast display refreshing (focused mode)
 
-		bool cursor;
+		bool cursorStatus;
 		int cursorRow;
 		int cursorCol;
 		unsigned char cursorMem;
@@ -58,7 +58,8 @@ class canvasCRS: public canvas {
 	public:
 		canvasCRS(int rows, int cols);
 		~canvasCRS();
-		void setCursor(bool state);
+		void setCursorStatus(bool state);
+		bool getCursorStatus();
 		void setFocusedMode(bool state);
 		void cls();
 		void cursorMov(int row, int col);
@@ -66,7 +67,7 @@ class canvasCRS: public canvas {
 		int getCRow();
 		int getCCol();
 		void setMouseInput(bool state); // TODO: Finish mouse funnctions
-		void focusedBGInputLoop();
+		void focusedBGInputLoop(unsigned char ExitKey);
 		int loadCanvas(std::string fileName);
 		int saveCanvas(std::string fileName);
 		int saveCanvasForce(std::string fileName);

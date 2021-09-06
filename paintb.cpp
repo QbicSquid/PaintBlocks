@@ -77,7 +77,7 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	cursorRow = 0;
 	cursorCol = 0;
 	cursorMem = 233;
-	cursor = false;
+	cursorStatus = false;
 	focusedMode = false;
 	mouseInput = false;
 
@@ -101,10 +101,10 @@ canvasCRS::~canvasCRS() {
 	SetConsoleMode(cihan , prevConsoleMode); // restoring previous consome mode
 }
 
-void canvasCRS::setCursor(bool state) {
-	if(cursor == state) {return; }
+void canvasCRS::setCursorStatus(bool state) {
+	if(cursorStatus == state) {return; }
 
-	cursor = state;
+	cursorStatus = state;
 
 	FS *current = head;
 	unsigned char temp;
@@ -122,17 +122,21 @@ void canvasCRS::setCursor(bool state) {
 	cursorMem = temp;
 }
 
-void canvasCRS::cursorMov(int row, int col) {
-	if(cursor == false) {return; }
+bool canvasCRS::getCursorStatus() {
+	return cursorStatus;
+}
 
-	setCursor(false);
+void canvasCRS::cursorMov(int row, int col) {
+	if(cursorStatus == false) {return; }
+
+	setCursorStatus(false);
 
 	if(0 <= row && row < rows && 0 <= col && col < cols) {
 		cursorRow = row;
 		cursorCol = col;
 	}
 
-	setCursor(true);
+	setCursorStatus(true);
 }
 
 void canvasCRS::print() {
@@ -232,9 +236,10 @@ void canvasCRS::setMouseInput(bool state) {
 	SetConsoleMode(cihan ,ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
 }
 
-void canvasCRS::focusedBGInputLoop() {
+void canvasCRS::focusedBGInputLoop(unsigned char ExitKey) {
 	if(focusedMode == false) { return; }
 
+	bool end = false;
 	while(true) {
 		DWORD numOfEventsRead;
 		ReadConsoleInput(cihan, &inputRecord, 1, &numOfEventsRead);
@@ -247,14 +252,22 @@ void canvasCRS::focusedBGInputLoop() {
 					(rows + 2) * (cols + 3), NULL, NULL); // print
 				WriteConsole(cohan, "\n", 1, NULL, NULL); // newline
 				break;
-				
+
 			case MOUSE_EVENT:
 				if(mouseInput == false) { continue; }
 				break;
-				
+
+			case KEY_EVENT:
+				if(inputRecord.Event.KeyEvent.uChar.AsciiChar == ExitKey) {
+					end = true;
+				}
+				break;
+
 			default:
 				continue;
 		}
+
+		if(end == true) { break; }
 
 		unsigned char out;
 		switch(inputRecord.Event.MouseEvent.dwButtonState){
@@ -296,13 +309,13 @@ int canvasCRS::loadCanvas(std::string fileName) {
 
 	file >> rows >> cols;
 	file.ignore(1);
-	setCursor(false);
+	setCursorStatus(false);
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
 			head->frameString[rawPos(i, j)] = file.get();
 		}
 	}
-	setCursor(true);
+	setCursorStatus(true);
 
 	file.close();
 	return 0;
@@ -325,13 +338,13 @@ int canvasCRS::saveCanvasForce(std::string fileName) {
 
 	file << COMP_KEY << "\n" << rows << " " << cols << "\n";
 
-	setCursor(false);
+	setCursorStatus(false);
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
 			file << head->frameString[rawPos(i, j)];
 		}
 	}
-	setCursor(true);
+	setCursorStatus(true);
 
 	file.close();
 	return 0;
