@@ -249,6 +249,7 @@ void canvasCRS::focusedMouseLoop() {
 	if(focusedMode == false || mouseInput == false) { return; }
 
 	while(true) {
+		DWORD numOfEventsRead;
 		ReadConsoleInput(cihan, &inputRecord, 1, &numOfEventsRead);
 
 		if(inputRecord.EventType != MOUSE_EVENT) {
@@ -266,6 +267,11 @@ void canvasCRS::focusedMouseLoop() {
 
 		head->frameString[rawPos(Y - 1, X - 1)] = 219;
 		print();
+		
+		// redraw console window
+		HWND winHandle = GetForegroundWindow();
+		InvalidateRect(winHandle, NULL, FALSE);
+		UpdateWindow(winHandle);
 	}
 }
 

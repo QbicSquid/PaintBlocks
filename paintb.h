@@ -39,7 +39,6 @@ class canvasCRS: public canvas {
 		bool mouseInput;
 		HANDLE cihan; // console input handle
 		INPUT_RECORD inputRecord;
-		DWORD numOfEventsRead; // required for reading console events
 		// for mouse input
 
 		unsigned char *display;
