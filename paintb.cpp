@@ -74,12 +74,9 @@ void canvas::print_fs() {
 
 // cursor:
 canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
-	cursorRow = 0;
-	cursorCol = 0;
-	cursorMem = 233;
-	cursorStatus = false;
 	focusedMode = false;
 	mouseInput = false;
+	block = 219;
 
 	// initializing console manipulation
 	cohan = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -99,44 +96,6 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 
 canvasCRS::~canvasCRS() {
 	SetConsoleMode(cihan , prevConsoleMode); // restoring previous consome mode
-}
-
-void canvasCRS::setCursorStatus(bool state) {
-	if(cursorStatus == state) {return; }
-
-	cursorStatus = state;
-
-	FS *current = head;
-	unsigned char temp;
-	int rawPos;
-
-	while(current->next != NULL){
-		current = current->next;
-	} // getting to current frame on multi frame scenarios
-	// might break when adding animations. CARE
-
-	rawPos = cursorCol + 1 + (cursorRow + 1) * (cols + 3);
-
-	temp = current->frameString[rawPos];
-	current->frameString[rawPos] = cursorMem;
-	cursorMem = temp;
-}
-
-bool canvasCRS::getCursorStatus() {
-	return cursorStatus;
-}
-
-void canvasCRS::cursorMov(int row, int col) {
-	if(cursorStatus == false) {return; }
-
-	setCursorStatus(false);
-
-	if(0 <= row && row < rows && 0 <= col && col < cols) {
-		cursorRow = row;
-		cursorCol = col;
-	}
-
-	setCursorStatus(true);
 }
 
 void canvasCRS::print() {
@@ -216,14 +175,6 @@ void canvasCRS::cls()  {
 	//reset console cursor
 }
 
-int canvasCRS::getCRow() {
-	return cursorRow;
-}
-
-int canvasCRS::getCCol() {
-	return cursorCol;
-}
-
 void canvasCRS::setMouseInput(bool state) {
 	if(mouseInput == state) { return; }
 	if(state == false) {
@@ -236,7 +187,7 @@ void canvasCRS::setMouseInput(bool state) {
 	SetConsoleMode(cihan ,ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
 }
 
-void canvasCRS::focusedBGInputLoop(unsigned char ExitKey) {
+void canvasCRS::inputLoop(unsigned char ExitKey) {
 	if(focusedMode == false) { return; }
 
 	bool end = false;
@@ -272,7 +223,7 @@ void canvasCRS::focusedBGInputLoop(unsigned char ExitKey) {
 		unsigned char out;
 		switch(inputRecord.Event.MouseEvent.dwButtonState){
 			case FROM_LEFT_1ST_BUTTON_PRESSED:
-				out = 219;
+				out = block;
 				break;
 			case RIGHTMOST_BUTTON_PRESSED:
 				out = ' ';
@@ -314,13 +265,11 @@ int canvasCRS::loadCanvas(std::string fileName) {
 
 	file >> rows >> cols;
 	file.ignore(1);
-	setCursorStatus(false);
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
 			head->frameString[rawPos(i, j)] = file.get();
 		}
 	}
-	setCursorStatus(true);
 
 	file.close();
 	return 0;
@@ -343,13 +292,11 @@ int canvasCRS::saveCanvasForce(std::string fileName) {
 
 	file << COMP_KEY << "\n" << rows << " " << cols << "\n";
 
-	setCursorStatus(false);
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
 			file << head->frameString[rawPos(i, j)];
 		}
 	}
-	setCursorStatus(true);
 
 	file.close();
 	return 0;

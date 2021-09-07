@@ -39,6 +39,7 @@ class canvasCRS: public canvas {
 		bool mouseInput;
 		HANDLE cihan; // console input handle
 		INPUT_RECORD inputRecord;
+		unsigned char block;
 		// for mouse input
 
 		unsigned char *display;
@@ -47,28 +48,17 @@ class canvasCRS: public canvas {
 		COORD jumpBack;
 		// for fast display refreshing (focused mode)
 
-		bool cursorStatus;
-		int cursorRow;
-		int cursorCol;
-		unsigned char cursorMem;
-		// for cursor functionality
-
 		void redrawConsole();
 
 	public:
 		canvasCRS(int rows, int cols);
 		~canvasCRS();
-		void setCursorStatus(bool state);
-		bool getCursorStatus();
 		void setFocusedMode(bool state);
 		void cls();
-		void cursorMov(int row, int col);
 		void print();
 		void maximize();
-		int getCRow();
-		int getCCol();
 		void setMouseInput(bool state); // TODO: Finish mouse funnctions
-		void focusedBGInputLoop(unsigned char ExitKey);
+		void inputLoop(unsigned char ExitKey);
 		int loadCanvas(std::string fileName);
 		int saveCanvas(std::string fileName);
 		int saveCanvasForce(std::string fileName);
