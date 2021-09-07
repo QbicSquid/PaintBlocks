@@ -299,6 +299,11 @@ void canvasCRS::redrawConsole() { // redraw console window
 	UpdateWindow(winHandle); // update window
 }
 
+void canvasCRS::maximize() {
+	HWND thisWH = GetForegroundWindow();
+	ShowWindow(thisWH, SW_MAXIMIZE);
+}
+
 int canvasCRS::loadCanvas(std::string fileName) {
 	std::ifstream file(fileName.data());
 	if(!file) {return -1; }

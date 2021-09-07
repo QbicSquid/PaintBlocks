@@ -64,6 +64,7 @@ class canvasCRS: public canvas {
 		void cls();
 		void cursorMov(int row, int col);
 		void print();
+		void maximize();
 		int getCRow();
 		int getCCol();
 		void setMouseInput(bool state); // TODO: Finish mouse funnctions

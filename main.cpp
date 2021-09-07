@@ -9,6 +9,7 @@ int main(void) {
 	cnv.setFocusedMode(true);
 	cnv.setMouseInput(true);
 
+	cnv.maximize();
 	cnv.focusedBGInputLoop('c');
 	cnv.setCursorStatus(true);
 
