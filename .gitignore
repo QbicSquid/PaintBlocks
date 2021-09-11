@@ -1,5 +1,5 @@
-*.o
-*.dev
-*.exe
-*.layout
-*.win
+*
+!/**/
+!*.cpp
+!*.h
+!.gitignore
