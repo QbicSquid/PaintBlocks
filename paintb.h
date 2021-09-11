@@ -23,8 +23,8 @@ class canvas {
 
 	public:	
 		canvas(int rows, int cols);
+		~canvas();
 		void setBlock(int row, int col, int key);
-
 		void print_fs(); // innefficient print function
 };
 

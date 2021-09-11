@@ -44,6 +44,11 @@ canvas::canvas(int rows, int cols) {
 	// framestring initialized
 }
 
+canvas::~canvas() {
+	delete head->frameString;
+	delete head;
+}
+
 int canvas::rawPos(int row, int col) {
 	return (col + 1) + (row + 1) * (cols + 3);
 }
@@ -77,6 +82,7 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	focusedMode = false;
 	mouseInput = false;
 	block = 219;
+	display = NULL;
 
 	// initializing console manipulation
 	cohan = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -96,6 +102,9 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 
 canvasCRS::~canvasCRS() {
 	SetConsoleMode(cihan , prevConsoleMode); // restoring previous consome mode
+	if(display != NULL) {
+		delete display;
+	}
 }
 
 void canvasCRS::print() {
