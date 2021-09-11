@@ -3,7 +3,7 @@
 #include "paintb.h"
 
 int main(void) {
-	canvasCRS cnv(20, 60);
+	canvasCRS cnv(100, 300);
 	cnv.setFocusedMode(true);
 	cnv.setMouseInput(true);
 

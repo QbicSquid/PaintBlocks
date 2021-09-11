@@ -31,9 +31,11 @@ class canvas {
 class canvasCRS: public canvas {
 	private:
 		HANDLE cohan; // console output handle
-		DWORD prevConsoleMode; // to restore in the destructor
+		DWORD consoleMode_prev; // to restore in the destructor
 		COORD topLeft;
-		CONSOLE_CURSOR_INFO cci;
+		CONSOLE_CURSOR_INFO cci; // console cursor infor to set
+		CONSOLE_FONT_INFOEX cfi_prev; // to restore in the destructor
+		CONSOLE_FONT_INFOEX cfi; // console font info to set
 		// for console manipulation
 
 		bool mouseInput;
@@ -53,12 +55,14 @@ class canvasCRS: public canvas {
 	public:
 		canvasCRS(int rows, int cols);
 		~canvasCRS();
-		void setFocusedMode(bool state);
 		void cls();
 		void print();
 		void maximize();
+		void setFocusedMode(bool state);
 		void setMouseInput(bool state); // TODO: Finish mouse funnctions
 		void inputLoop(unsigned char ExitKey);
+		void zoomIn();
+		void zoomOut();
 		int loadCanvas(std::string fileName);
 		int saveCanvas(std::string fileName);
 		int saveCanvasForce(std::string fileName);

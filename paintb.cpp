@@ -87,24 +87,52 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	// initializing console manipulation
 	cohan = GetStdHandle(STD_OUTPUT_HANDLE);
 	cihan = GetStdHandle(STD_INPUT_HANDLE);
-	DWORD prevMode;
-	GetConsoleMode(cihan, &prevMode);
-	prevConsoleMode = prevMode;
-	
-	
+	GetConsoleMode(cihan, &consoleMode_prev);
+
+	cfi_prev.cbSize = sizeof(CONSOLE_FONT_INFOEX);
+	GetCurrentConsoleFontEx(cohan, FALSE, &cfi_prev); // to restore later
+	cfi.cbSize = sizeof(CONSOLE_FONT_INFOEX);
+	cfi.dwFontSize.X = 4;
+	cfi.dwFontSize.Y = 6;
+	wcscpy(cfi.FaceName, L"Terminal");
+	cfi.FontFamily = FF_DONTCARE;
+	cfi.FontWeight = FW_NORMAL;
+	cfi.nFont = 0;
+
+
 	topLeft.X = 0;
 	topLeft.Y = 0;
-	
+
 	cci.dwSize = 25;
 	cci.bVisible = FALSE;
 	// console manipulation initialized
 }
 
 canvasCRS::~canvasCRS() {
-	SetConsoleMode(cihan , prevConsoleMode); // restoring previous consome mode
+	SetConsoleMode(cihan , consoleMode_prev); // restoring previous consome mode
+	SetCurrentConsoleFontEx(cohan, FALSE, &cfi_prev);
+	cls();
 	if(display != NULL) {
 		delete display;
 	}
+}
+
+void canvasCRS::cls()  {
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	if(!GetConsoleScreenBufferInfo(cohan, &csbi)) {
+		// handle failure
+		return;
+	}
+
+	DWORD written = 0;
+	DWORD length = csbi.dwSize.X * csbi.dwSize.Y;
+	FillConsoleOutputCharacter(cohan, TEXT(' '),
+		length, topLeft, &written); // fill the console with spaces
+	FillConsoleOutputAttribute(cohan, csbi.wAttributes,
+		length, topLeft, &written); // clear background color formatting, if any
+
+	SetConsoleCursorPosition(cohan, topLeft);
+	//reset console cursor
 }
 
 void canvasCRS::print() {
@@ -134,19 +162,27 @@ void canvasCRS::print() {
 	}
 }
 
+void canvasCRS::maximize() {
+	HWND thisWH = GetForegroundWindow();
+	ShowWindow(thisWH, SW_MAXIMIZE);
+}
+
 void canvasCRS::setFocusedMode(bool state) {
 	if(focusedMode == state) {return; }
 
 	if(focusedMode == true){
 		delete display;
+		SetCurrentConsoleFontEx(cohan, FALSE, &cfi_prev); // restoring font
 		focusedMode = false;
 		return;
 	}
-	
+
 	display = new unsigned char[(rows + 2) * (cols + 3)];
 	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
 		display[i] = head->frameString[i];
 	}
+
+	SetCurrentConsoleFontEx(cohan, FALSE, &cfi); // setting font
 
 	std::cout.flush();
 	cls();
@@ -166,28 +202,11 @@ void canvasCRS::setFocusedMode(bool state) {
 	focusedMode = true;
 }
 
-void canvasCRS::cls()  {
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	if(!GetConsoleScreenBufferInfo(cohan, &csbi)) {
-		// handle failure
-		return;
-	}
-
-	DWORD written = 0;
-	DWORD length = csbi.dwSize.X * csbi.dwSize.Y;
-	FillConsoleOutputCharacter(cohan, TEXT(' '),
-		length, topLeft, &written); // fill the console with spaces
-	FillConsoleOutputAttribute(cohan, csbi.wAttributes,
-		length, topLeft, &written); // clear background color formatting, if any
-
-	SetConsoleCursorPosition(cohan, topLeft);
-	//reset console cursor
-}
-
 void canvasCRS::setMouseInput(bool state) {
 	if(mouseInput == state) { return; }
 	if(state == false) {
-		SetConsoleMode(cihan , prevConsoleMode);
+		SetConsoleMode(cihan , consoleMode_prev);
+		SetCurrentConsoleFontEx(cohan, FALSE, &cfi_prev);
 		state = false;
 		return;
 	}
@@ -253,15 +272,38 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 	}
 }
 
-void canvasCRS::redrawConsole() { // redraw console window
-	HWND winHandle = GetForegroundWindow(); // get window handle
-	InvalidateRect(winHandle, NULL, FALSE); // queue window for updating
-	UpdateWindow(winHandle); // update window
+void canvasCRS::zoomIn() {
+	switch(cfi.dwFontSize.X){
+		case 4:
+			cfi.dwFontSize.X = 8;
+			cfi.dwFontSize.Y = 12;
+			break;
+		case 8:
+			cfi.dwFontSize.X = 12;
+			cfi.dwFontSize.Y = 16;
+			break;
+		default:
+			return;
+	}
+
+	SetCurrentConsoleFontEx(cohan, FALSE, &cfi);
 }
 
-void canvasCRS::maximize() {
-	HWND thisWH = GetForegroundWindow();
-	ShowWindow(thisWH, SW_MAXIMIZE);
+void canvasCRS::zoomOut() {
+	switch(cfi.dwFontSize.X){
+		case 8:
+			cfi.dwFontSize.X = 4;
+			cfi.dwFontSize.Y = 6;
+			break;
+		case 12:
+			cfi.dwFontSize.X = 8;
+			cfi.dwFontSize.Y = 12;
+			break;
+		default:
+			return;
+	}
+
+	SetCurrentConsoleFontEx(cohan, FALSE, &cfi);
 }
 
 int canvasCRS::loadCanvas(std::string fileName) {
@@ -309,5 +351,11 @@ int canvasCRS::saveCanvasForce(std::string fileName) {
 
 	file.close();
 	return 0;
+}
+
+void canvasCRS::redrawConsole() { // redraw console window
+	HWND winHandle = GetForegroundWindow(); // get window handle
+	InvalidateRect(winHandle, NULL, FALSE); // queue window for updating
+	UpdateWindow(winHandle); // update window
 }
 
