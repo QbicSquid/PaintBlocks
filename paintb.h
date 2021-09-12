@@ -4,6 +4,18 @@
 #include <windows.h>
 #include <string>
 
+class canvas;
+class canvasCRS;
+
+enum funcType { voidPtr, cnvVoidPtr};
+struct func {
+	union {
+		void (*voidFunc) ();
+		void (canvasCRS::*cnvFunc) (); 
+	};
+	funcType type;
+};
+
 class canvas {
 	protected:
 		typedef struct FS {
