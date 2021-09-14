@@ -8,6 +8,20 @@ int main(void) {
 	cnv.setMouseInput(true);
 
 	cnv.maximize();
-	cnv.inputLoop('c');
+	
+	unsigned char key = 0;
+	
+	while(key != 'c') {	
+		cnv.inputLoop('m');
+		key = getch();
+		switch(key) {
+			case 'i':
+				cnv.zoomIn();
+				break;
+			case 'o':
+				cnv.zoomOut();
+				break;
+		}
+	}
 }
 

@@ -156,9 +156,6 @@ void canvasCRS::print() {
 		SetConsoleCursorPosition(cohan, jumpTo);
 		WriteConsole(cohan, &display[i],
 		1, NULL, NULL); // print
-
-		SetConsoleCursorPosition(cohan, jumpBack);
-		// moveing the console cursor to jumpBack position
 	}
 }
 
@@ -238,6 +235,8 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 
 			case KEY_EVENT:
 				if(inputRecord.Event.KeyEvent.uChar.AsciiChar == ExitKey) {
+					SetConsoleCursorPosition(cohan, jumpBack);
+					// moveing the console cursor to jumpBack position
 					end = true;
 				}
 				break;
