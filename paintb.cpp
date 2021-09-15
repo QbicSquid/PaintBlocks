@@ -214,10 +214,12 @@ void canvasCRS::setMouseInput(bool state) {
 
 void canvasCRS::inputLoop(unsigned char ExitKey) {
 	if(focusedMode == false) { return; }
+	
+	INPUT_RECORD inputRecord;
+	DWORD numOfEventsRead;
+	unsigned char out;
 
-	bool end = false;
 	while(true) {
-		DWORD numOfEventsRead;
 		ReadConsoleInput(cihan, &inputRecord, 1, &numOfEventsRead);
 
 		switch(inputRecord.EventType) {
@@ -227,7 +229,7 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 				WriteConsole(cohan, head->frameString,
 					(rows + 2) * (cols + 3), NULL, NULL); // print
 				WriteConsole(cohan, "\n", 1, NULL, NULL); // newline
-				break;
+				continue;
 
 			case MOUSE_EVENT:
 				if(mouseInput == false) { continue; }
@@ -237,17 +239,14 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 				if(inputRecord.Event.KeyEvent.uChar.AsciiChar == ExitKey) {
 					SetConsoleCursorPosition(cohan, jumpBack);
 					// moveing the console cursor to jumpBack position
-					end = true;
+					return;
 				}
-				break;
+				continue;
 
 			default:
 				continue;
 		}
 
-		if(end == true) { break; }
-
-		unsigned char out;
 		switch(inputRecord.Event.MouseEvent.dwButtonState){
 			case FROM_LEFT_1ST_BUTTON_PRESSED:
 				out = block;

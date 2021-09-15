@@ -52,7 +52,6 @@ class canvasCRS: public canvas {
 
 		bool mouseInput;
 		HANDLE cihan; // console input handle
-		INPUT_RECORD inputRecord;
 		unsigned char block;
 		// for mouse input
 
