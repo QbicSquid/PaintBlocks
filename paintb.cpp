@@ -83,6 +83,18 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	mouseInput = false;
 	block = 219;
 	display = NULL;
+	
+	// initializing color support
+	color = 7;
+	colorHead = new FS;
+	colorHead->frameString = new unsigned char[(rows + 2) * (cols + 3)];
+	colorHead->next = NULL;
+	colorHead->prev = NULL;
+	
+	for(int i =0; i < (rows + 2) * (cols + 3); i++) {
+		colorHead->frameString[i] = 7;
+	}
+	// color support initialized
 
 	// initializing console manipulation
 	cohan = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -112,6 +124,9 @@ canvasCRS::~canvasCRS() {
 	SetConsoleMode(cihan , consoleMode_prev); // restoring previous consome mode
 	SetCurrentConsoleFontEx(cohan, FALSE, &cfi_prev);
 	cls();
+	
+	delete colorHead->frameString;
+	delete colorHead;
 	if(display != NULL) {
 		delete display;
 	}
@@ -138,6 +153,7 @@ void canvasCRS::cls()  {
 void canvasCRS::print() {
 	if(focusedMode == false) {
 		print_fs();
+		// TODO: add a proper unfocused print functionality here
 		return;
 	}
 
@@ -145,23 +161,58 @@ void canvasCRS::print() {
 	// in case the console resized, making the console cursor invisible
 
 	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
-		if(display[i] == head->frameString[i]) {
+		if(display[i] == head->frameString[i] && 
+			displayColor[i] == colorHead->frameString[i]) {
 			continue;
 		}
 
 		display[i] = head->frameString[i];
+		displayColor[i] = colorHead->frameString[i];
 		jumpTo.X = i % (cols + 3);
 		jumpTo.Y = i / (cols + 3);
 
 		SetConsoleCursorPosition(cohan, jumpTo);
+		SetConsoleTextAttribute(cohan, displayColor[i]);
+		
 		WriteConsole(cohan, &display[i],
 		1, NULL, NULL); // print
+		
+	}
+}
+
+void canvasCRS::printFull(){
+	std::cout.flush();
+	cls();
+	SetConsoleCursorPosition(cohan, topLeft);
+	// reset the console cursor
+	SetConsoleCursorInfo(cohan, &cci);
+	// in case the console resized, making the console cursor invisible
+	
+	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
+		SetConsoleTextAttribute(cohan, displayColor[i]);
+		
+		WriteConsole(cohan, &display[i],
+		1, NULL, NULL); // print
+	}
+	SetConsoleTextAttribute(cohan, 7);
+}
+
+void canvasCRS::refreshDisplayString() {
+	displayColor = new unsigned char[(rows + 2) * (cols + 3)];
+	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
+		displayColor[i] = colorHead->frameString[i];
+	}
+	
+	display = new unsigned char[(rows + 2) * (cols + 3)];
+	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
+		display[i] = head->frameString[i];
 	}
 }
 
 void canvasCRS::maximize() {
 	HWND thisWH = GetForegroundWindow();
 	ShowWindow(thisWH, SW_MAXIMIZE);
+	Sleep(100);
 }
 
 void canvasCRS::setFocusedMode(bool state) {
@@ -174,23 +225,9 @@ void canvasCRS::setFocusedMode(bool state) {
 		return;
 	}
 
-	display = new unsigned char[(rows + 2) * (cols + 3)];
-	for(int i = 0;i < (rows + 2) * (cols + 3); i++) {
-		display[i] = head->frameString[i];
-	}
+	refreshDisplayString(); // initializing display and displayColor FS
 
 	SetCurrentConsoleFontEx(cohan, FALSE, &cfi); // setting font
-
-	std::cout.flush();
-	cls();
-	SetConsoleCursorPosition(cohan, topLeft);
-	// reset the console cursor
-	SetConsoleCursorInfo(cohan, &cci);
-	// in case the console resized, making the console cursor invisible
-
-	WriteConsole(cohan, head->frameString,
-		(rows + 2) * (cols + 3), NULL, NULL); // print
-	WriteConsole(cohan, "\n", 1, NULL, NULL); // newline
 
 	// saving the position to move the cursor back to
 	jumpBack.X = 0;
@@ -218,6 +255,7 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 	INPUT_RECORD inputRecord;
 	DWORD numOfEventsRead;
 	unsigned char out;
+	unsigned char outColor;
 
 	while(true) {
 		ReadConsoleInput(cihan, &inputRecord, 1, &numOfEventsRead);
@@ -239,6 +277,8 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 				if(inputRecord.Event.KeyEvent.uChar.AsciiChar == ExitKey) {
 					SetConsoleCursorPosition(cohan, jumpBack);
 					// moveing the console cursor to jumpBack position
+					SetConsoleTextAttribute(cohan, 7);
+					// resetting output color
 					return;
 				}
 				continue;
@@ -250,9 +290,11 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 		switch(inputRecord.Event.MouseEvent.dwButtonState){
 			case FROM_LEFT_1ST_BUTTON_PRESSED:
 				out = block;
+				outColor = color;
 				break;
 			case RIGHTMOST_BUTTON_PRESSED:
 				out = ' ';
+				outColor = 7;
 				break;
 			default:
 				continue;
@@ -263,10 +305,21 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 
 		if(Y == 0 || Y >= rows + 1 || X == 0 || X >= cols + 1) { continue; }
 
+		// TODO: make a paint(int size) function and call it here
 		head->frameString[rawPos(Y - 1, X - 1)] = out;
+		colorHead->frameString[rawPos(Y - 1, X - 1)] = outColor;
+		
 		print();
 
 		redrawConsole();
+	}
+}
+
+void canvasCRS::changeColor(int newColor) {
+	if(newColor == -1) { color = 7; }
+	
+	if(0 < newColor && newColor < 16) {
+		color = newColor;
 	}
 }
 
@@ -316,7 +369,14 @@ int canvasCRS::loadCanvas(std::string fileName) {
 	file.ignore(1);
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
-			head->frameString[rawPos(i, j)] = file.get();
+			head->frameString[rawPos(i, j)] = (unsigned char)file.get();
+		}
+	}
+
+	file.ignore(1);
+	for(int i = 0; i < rows; i++) {
+		for(int j = 0; j < cols; j++) {
+			colorHead->frameString[rawPos(i, j)] = (unsigned char)file.get();
 		}
 	}
 
@@ -344,6 +404,14 @@ int canvasCRS::saveCanvasForce(std::string fileName) {
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
 			file << head->frameString[rawPos(i, j)];
+		}
+	}
+
+	file << "\n";
+
+	for(int i = 0; i < rows; i++) {
+		for(int j = 0; j < cols; j++) {
+			file << colorHead->frameString[rawPos(i, j)];
 		}
 	}
 

@@ -49,6 +49,10 @@ class canvasCRS: public canvas {
 		CONSOLE_FONT_INFOEX cfi_prev; // to restore in the destructor
 		CONSOLE_FONT_INFOEX cfi; // console font info to set
 		// for console manipulation
+		
+		unsigned char color;
+		FS *colorHead;
+		// color support
 
 		bool mouseInput;
 		HANDLE cihan; // console input handle
@@ -56,6 +60,7 @@ class canvasCRS: public canvas {
 		// for mouse input
 
 		unsigned char *display;
+		unsigned char *displayColor;
 		bool focusedMode;
 		COORD jumpTo;
 		COORD jumpBack;
@@ -68,10 +73,13 @@ class canvasCRS: public canvas {
 		~canvasCRS();
 		void cls();
 		void print();
+		void printFull();
+		void refreshDisplayString();
 		void maximize();
 		void setFocusedMode(bool state);
 		void setMouseInput(bool state); // TODO: Finish mouse funnctions
 		void inputLoop(unsigned char ExitKey);
+		void changeColor(int newColor);
 		void zoomIn();
 		void zoomOut();
 		int loadCanvas(std::string fileName);
