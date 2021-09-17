@@ -38,6 +38,8 @@ class canvas {
 		~canvas();
 		void setBlock(int row, int col, int key);
 		void print_fs(); // innefficient print function
+		void initFS(FS &fs, int rows, int cols);
+		// initialize given FS(add border and fill with whitespace)
 };
 
 class canvasCRS: public canvas {
@@ -77,7 +79,7 @@ class canvasCRS: public canvas {
 		void refreshDisplayString();
 		void maximize();
 		void setFocusedMode(bool state);
-		void setMouseInput(bool state); // TODO: Finish mouse funnctions
+		void setMouseInput(bool state);
 		void inputLoop(unsigned char ExitKey);
 		void changeColor(int newColor);
 		void zoomIn();

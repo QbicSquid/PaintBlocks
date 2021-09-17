@@ -83,6 +83,7 @@ canvasCRS::canvasCRS(int rows, int cols) : canvas(rows, cols) {
 	mouseInput = false;
 	block = 219;
 	display = NULL;
+	displayColor = NULL;
 	
 	// initializing color support
 	color = 7;
@@ -366,6 +367,45 @@ int canvasCRS::loadCanvas(std::string fileName) {
 	if(compKey != COMP_KEY) {return -2; }
 
 	file >> rows >> cols;
+	
+	// creating new framestring and colorstring
+	delete head->frameString;
+	delete colorHead->frameString;
+	
+	head->frameString = new unsigned char[(rows + 2) * (cols + 3)];
+	colorHead->frameString = new unsigned char[(rows + 2) * (cols + 3)];
+	
+		// initializing frameStringColor
+	for(int i =0; i < (rows + 2) * (cols + 3); i++) {
+		colorHead->frameString[i] = 7;
+	}
+		// frameStringColor initialized!
+	
+		// initializing framestring border
+	head->frameString[0] = 218;
+	for(int c = 1; c < cols + 1; c++) {
+		head->frameString[c] = 196;
+	}
+	head->frameString[cols + 1] = 191;
+	head->frameString[cols + 2] = '\n';
+
+	for(int r = 1; r < rows + 1; r++) {
+		head->frameString[r * (cols + 3)] = 179;
+		
+		head->frameString[(r + 1) * (cols + 3) - 2] = 179;
+		head->frameString[(r + 1) * (cols + 3) - 1] = '\n';
+	}
+
+	head->frameString[(cols + 3) * (rows + 1)] = 192;
+	for(int c = 1; c < cols + 1; c++) {
+		head->frameString[(cols + 3) * (rows + 1) + c] = 196;
+	}
+	head->frameString[(cols + 3) * (rows + 2) - 2] = 217;
+
+	head->frameString[(cols + 3) * (rows + 2) - 1] = '\0';
+		// framestring border initialized!
+	// framsetring and colorstring craetion done!
+	
 	file.ignore(1);
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
@@ -379,6 +419,18 @@ int canvasCRS::loadCanvas(std::string fileName) {
 			colorHead->frameString[rawPos(i, j)] = (unsigned char)file.get();
 		}
 	}
+	
+	// reloading display string
+	if(display != NULL){
+		delete display;
+		display = new unsigned char[(rows + 2) * (cols + 3)];
+		
+		delete displayColor;
+		displayColor = new unsigned char[(rows + 2) * (cols + 3)];
+		
+		refreshDisplayString(); // refresh displayString and displaColorString
+	}
+	// reloading display string done!
 
 	file.close();
 	return 0;

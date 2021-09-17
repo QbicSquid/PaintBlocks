@@ -3,7 +3,7 @@
 #include "paintb.h"
 
 int main(void) {
-	canvasCRS cnv(20, 60);
+	canvasCRS cnv(30, 60);
 	cnv.setFocusedMode(true);
 	cnv.setMouseInput(true);
 	unsigned char key = 'r';
@@ -35,7 +35,6 @@ int main(void) {
 				break;
 			case 'l':
 				cnv.loadCanvas("save1.pb");
-				cnv.refreshDisplayString();
 				cnv.printFull();
 				break;
 			default:
