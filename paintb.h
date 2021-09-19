@@ -80,7 +80,7 @@ class canvasCRS: public canvas {
 		void maximize();
 		void setFocusedMode(bool state);
 		void setMouseInput(bool state);
-		void inputLoop(unsigned char ExitKey);
+		unsigned char inputLoop();
 		void changeColor(int newColor);
 		void zoomIn();
 		void zoomOut();

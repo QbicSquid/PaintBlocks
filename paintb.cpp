@@ -250,8 +250,8 @@ void canvasCRS::setMouseInput(bool state) {
 	SetConsoleMode(cihan ,ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
 }
 
-void canvasCRS::inputLoop(unsigned char ExitKey) {
-	if(focusedMode == false) { return; }
+unsigned char canvasCRS::inputLoop() {
+	if(focusedMode == false) { return 0; }
 	
 	INPUT_RECORD inputRecord;
 	DWORD numOfEventsRead;
@@ -275,14 +275,13 @@ void canvasCRS::inputLoop(unsigned char ExitKey) {
 				break;
 
 			case KEY_EVENT:
-				if(inputRecord.Event.KeyEvent.uChar.AsciiChar == ExitKey) {
+				if(inputRecord.Event.KeyEvent.bKeyDown) {
 					SetConsoleCursorPosition(cohan, jumpBack);
 					// moveing the console cursor to jumpBack position
 					SetConsoleTextAttribute(cohan, 7);
 					// resetting output color
-					return;
+					return inputRecord.Event.KeyEvent.uChar.AsciiChar;
 				}
-				continue;
 
 			default:
 				continue;

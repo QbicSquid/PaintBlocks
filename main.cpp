@@ -3,7 +3,14 @@
 #include "paintb.h"
 
 int main(void) {
-	canvasCRS cnv(30, 60);
+	int rows, cols;
+	
+	std::cout << "Enter the number of rows: " << "\n";
+	std::cin >> rows;
+	std::cout << "Enter the number of columnss: " << "\n";
+	std::cin >> cols;
+	
+	canvasCRS cnv(rows, cols);
 	cnv.setFocusedMode(true);
 	cnv.setMouseInput(true);
 	unsigned char key = 'r';
@@ -13,9 +20,6 @@ int main(void) {
 	
 	while(key != 'q') {	
 		switch(key) {
-			case 'r':
-				cnv.inputLoop('m');
-				break;
 			case 'i':
 				cnv.zoomIn();
 				break;
@@ -44,7 +48,7 @@ int main(void) {
 				break;
 		}
 		
-		key = getch();
+		key = cnv.inputLoop();
 	}
 }
 
